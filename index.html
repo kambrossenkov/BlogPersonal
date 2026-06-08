@@ -803,9 +803,7 @@
           <p id="modal-descripcion" style="font-family:'Inter',sans-serif; font-size:15px; line-height:1.8; color:rgba(255,255,255,0.75); margin-bottom:16px;"></p>
           <ul id="modal-bullets" style="font-family:'Inter',sans-serif; font-size:14px; line-height:1.75; color:rgba(255,255,255,0.55); list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;"></ul>
         </div>
-        <div style="flex-shrink:0; width:100%; height:3px; background:rgba(255,255,255,0.1);">
-          <div id="modal-progress-bar" style="height:100%; width:0%; background:linear-gradient(to right,#a78bfa,#60a5fa); transition:none;"></div>
-        </div>
+
         <div style="flex-shrink:0; width:100%; height:68px; padding:0 24px; display:flex; justify-content:space-between; align-items:center; background:rgba(10,10,15,0.95); border-top:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(10px);">
           <button id="modal-cerrar" style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:white; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
           <div style="display:flex; align-items:center; gap:12px;">
@@ -890,70 +888,7 @@
     })();
     </script>
 
-    <!-- Auto-scroll desktop cada 45 segundos -->
-    <script>
-      (function () {
-        const INTERVALO_MS = 45000; // 45 segundos
-        let indiceActual = 0, timer = null, pausado = false;
-        
-        function obtenerBloques() { 
-          return Array.from(document.querySelectorAll('.timeline-block')); 
-        }
 
-        function obtenerIndiceMasCercano() {
-          const bloques = obtenerBloques();
-          const centro = window.innerHeight / 2;
-          let indiceMasCercano = 0;
-          let distMin = Infinity;
-          bloques.forEach((b, i) => {
-            const rect = b.getBoundingClientRect();
-            const dist = Math.abs(rect.top + rect.height / 2 - centro);
-            if (dist < distMin) {
-              distMin = dist;
-              indiceMasCercano = i;
-            }
-          });
-          return indiceMasCercano;
-        }
-        
-        function irAlSiguiente() {
-          const bloques = obtenerBloques();
-          if (!bloques.length) return;
-          
-          indiceActual = obtenerIndiceMasCercano();
-          indiceActual = (indiceActual + 1) % bloques.length;
-          // Hace que el salto sea suave (smooth) y quede en el centro de la pantalla
-          bloques[indiceActual].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        
-        function iniciarTimer() {
-          if (timer) clearInterval(timer);
-          timer = setInterval(() => { 
-            if (!pausado) irAlSiguiente(); 
-          }, INTERVALO_MS);
-        }
-        
-        // Si el usuario scrollea por su cuenta, pausamos el temporizador 5 segundos
-        let scrollTimeout = null;
-        window.addEventListener('wheel', () => { 
-          pausado = true; 
-          clearTimeout(scrollTimeout); 
-          scrollTimeout = setTimeout(() => { pausado = false; }, 5000); 
-        }, { passive: true });
-        
-        window.addEventListener('touchmove', () => { 
-          pausado = true; 
-          clearTimeout(scrollTimeout); 
-          scrollTimeout = setTimeout(() => { pausado = false; }, 5000); 
-        }, { passive: true });
-        
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', iniciarTimer);
-        } else {
-          iniciarTimer();
-        }
-      })();
-    </script>
 
     <!-- Data + lógica del modal mobile -->
     <script>
@@ -1063,22 +998,9 @@
         renderHito(); detenerAutoAvance(); iniciarAutoAvance();
       }
 
-      function iniciarAutoAvance() {
-        detenerAutoAvance();
-        progressBar.style.transition = 'none'; progressBar.style.width = '0%';
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            progressBar.style.transition = 'width ' + MODAL_DURACION + 'ms linear';
-            progressBar.style.width = '100%';
-          });
-        });
-        autoTimer = setTimeout(siguienteHito, MODAL_DURACION);
-      }
+      function iniciarAutoAvance() {}
 
-      function detenerAutoAvance() {
-        if (autoTimer) clearTimeout(autoTimer);
-        progressBar.style.transition = 'none'; progressBar.style.width = '0%';
-      }
+      function detenerAutoAvance() {}
 
       btnCerrar.addEventListener('click', cerrarModal);
       btnSiguiente.addEventListener('click', siguienteHito);
