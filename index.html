@@ -369,8 +369,16 @@
     }
 
     /* ---- BLOQUE 2 — ningún div interno debe tener background propio ---- */
-    section#trayectoria div {
+    section#trayectoria > div:not(#shader-bg-trayectoria):not(#timeline-container) {
       background: transparent !important;
+    }
+
+    #timeline-progress {
+      background: linear-gradient(to bottom, #3b82f6, #a855f7) !important;
+    }
+
+    div.absolute.left-\[30px\].md\:left-1\/2.top-0.bottom-0 {
+      background: rgb(38, 38, 38) !important;
     }
     /* Excepciones: líneas del timeline y puntos deben mantener su color */
     #timeline-container > .bg-neutral-800 {
@@ -542,9 +550,9 @@
 
         <div id="timeline-container" class="relative w-full pb-10">
           
-          <div class="absolute left-[30px] md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-[2px] bg-neutral-800 rounded-full"></div>
-          
-          <div id="timeline-progress" class="absolute left-[30px] md:left-1/2 md:-translate-x-1/2 top-0 w-[2px] bg-gradient-to-b from-blue-500 to-purple-500 rounded-full z-20 origin-top" style="transform: scaleY(0);"></div>
+          <div class="absolute left-[30px] md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-[2px] bg-neutral-800 rounded-full" style="z-index:2;"></div>
+
+          <div id="timeline-progress" class="absolute left-[30px] md:left-1/2 md:-translate-x-1/2 top-0 w-[2px] bg-gradient-to-b from-blue-500 to-purple-500 rounded-full" style="z-index:3; height:0%;"></div>
 
           <div class="relative z-10 flex flex-col gap-12 md:gap-24 pt-8">
 
@@ -819,34 +827,25 @@
 
     <!-- Progreso de la línea de tiempo (scroll → height %) -->
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const timelineContainer = document.getElementById('timeline-container');
-        const timelineProgress = document.getElementById('timeline-progress');
-        let ticking = false; // Variable para controlar los frames
-        
-        if (timelineContainer && timelineProgress) {
-          const updateProgress = () => {
-            const rect = timelineContainer.getBoundingClientRect();
-            const startTrigger = window.innerHeight * 0.5; 
-            
-            let percentage = (startTrigger - rect.top) / rect.height;
-            percentage = Math.max(0, Math.min(1, percentage)); // Escala entre 0 y 1
-            
-            timelineProgress.style.transform = `scaleY(${percentage})`;
-            ticking = false;
-          };
+document.addEventListener('DOMContentLoaded', () => {
+  const timelineContainer = document.getElementById('timeline-container');
+  const timelineProgress = document.getElementById('timeline-progress');
+  if (!timelineContainer || !timelineProgress) return;
 
-          window.addEventListener('scroll', () => {
-            if (!ticking) {
-              window.requestAnimationFrame(updateProgress);
-              ticking = true;
-            }
-          }, { passive: true }); // passive true mejora el rendimiento en móviles
-          
-          updateProgress();
-        }
-      });
-    </script>
+  window.addEventListener('scroll', () => {
+    const containerRect = timelineContainer.getBoundingClientRect();
+    const containerTop = containerRect.top;
+    const containerHeight = containerRect.height;
+    const triggerPoint = window.innerHeight * 0.6;
+
+    let percentage = ((triggerPoint - containerTop) / containerHeight) * 100;
+    percentage = Math.max(0, Math.min(100, percentage));
+    timelineProgress.style.height = percentage + '%';
+  }, { passive: true });
+
+  window.dispatchEvent(new Event('scroll'));
+});
+</script>
 
     <!-- Sistema bilingüe data-es/data-en + HITOS_MODAL -->
     <script>
