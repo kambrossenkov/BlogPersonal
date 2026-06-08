@@ -1628,16 +1628,808 @@ document.addEventListener('DOMContentLoaded', () => {
   </section>
 
   <!-- Bloque 4 — Inventos -->
-  <section id="inventos" style="position:relative; background-color:#000d1a; background-image:linear-gradient(rgba(0,229,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.1) 1px, transparent 1px); background-size:32px 32px;">
+  <section id="inventos" style="position:relative; background-color:#000; overflow:hidden;">
+    <style>
+      @font-face {
+        font-family: 'Monument Extended';
+        src: url('https://fonts.cdnfonts.com/css/monument-extended');
+      }
+      /* ── Tipografía Premium ── */
+      #inventos .animate-slide-up h1 {
+        font-family: 'Monument Extended', 'Clash Display', sans-serif !important;
+        font-size: 104px !important;
+        font-weight: 800 !important;
+        letter-spacing: -4px !important;
+        line-height: 0.9 !important;
+        color: #F5F5F5 !important;
+      }
+      #inventos .animate-slide-up p {
+        font-family: 'Inter Tight', sans-serif !important;
+        font-size: 24px !important;
+        font-weight: 400 !important;
+        line-height: 1.8 !important;
+        letter-spacing: -0.2px !important;
+        color: rgba(255,255,255,0.68) !important;
+      }
+      #inventos main section h2,
+      #inventos main section h3 {
+        font-family: 'Clash Display', sans-serif !important;
+        font-size: 64px !important;
+        font-weight: 600 !important;
+        line-height: 0.95 !important;
+        letter-spacing: -2px !important;
+        color: #F8F8F8 !important;
+      }
+      #inventos main section p {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 20px !important;
+        font-weight: 400 !important;
+        line-height: 1.85 !important;
+        letter-spacing: -0.2px !important;
+        color: rgba(255,255,255,0.74) !important;
+      }
+      #inventos main section .pt-2 a {
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.5px !important;
+        color: #5EA2FF !important;
+      }
+      .ocean-main-text,
+      .ocean-hover-text,
+      #inventos main section span.tracking-wide {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.3px !important;
+        color: rgba(255,255,255,0.62) !important;
+      }
+      @media (max-width: 768px) {
+        #inventos .animate-slide-up h1 { font-size: 60px !important; letter-spacing: -2px !important; }
+        #inventos main section h2,
+        #inventos main section h3 { font-size: 38px !important; letter-spacing: -1px !important; }
+        #inventos main section p { font-size: 16px !important; }
+      }
+      .popup-overlay-inv {
+        position: fixed; inset: 0; z-index: 9999;
+        background: rgba(5, 10, 24, 0.92);
+        backdrop-filter: blur(16px);
+        display: flex; align-items: center;
+        justify-content: center; padding: 24px;
+      }
+      .popup-overlay-inv.hidden { display: none; }
+      .popup-card-inv {
+        width: 100%; max-width: 400px;
+        background: #0f1a2e;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 32px; padding: 32px;
+        display: flex; flex-direction: column; gap: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        animation: popupInInv 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      }
+      @keyframes popupInInv {
+        from { opacity:0; transform:translateY(24px) scale(0.95); }
+        to   { opacity:1; transform:translateY(0) scale(1); }
+      }
+      .popup-header-inv { display:flex; flex-direction:column; gap:4px; }
+      .popup-title-inv {
+        font-family: 'Satoshi', sans-serif; font-size: 28px; font-weight: 700;
+        letter-spacing: -1px; line-height: 1.1; color: #F5F7FA; margin: 0;
+      }
+      .popup-desc-inv {
+        font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 400;
+        line-height: 1.7; color: rgba(255,255,255,0.72); margin: 0;
+      }
+      .popup-label-inv {
+        display:flex; flex-direction:column; gap:8px;
+        font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 500;
+        letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.6);
+      }
+      .popup-input-inv {
+        height:48px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);
+        background:rgba(255,255,255,0.05); padding:0 16px;
+        font-family: 'Inter', sans-serif; font-size:17px; font-weight:500;
+        color:rgba(255,255,255,0.92); outline:none; transition:border-color 0.2s;
+      }
+      .popup-input-inv::placeholder { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 400; color: rgba(255,255,255,0.38); }
+      .popup-input-inv:focus { border-color:#4a90d9; }
+      .popup-input-inv.error { border-color:#ef4444; }
+      .popup-error-inv { font-family: 'Inter', sans-serif; font-size:13px; color:#ef4444; min-height:16px; display:block; }
+      .popup-btn-inv {
+        width:100%; padding:14px 16px; border-radius:100px;
+        background:#F5F7FA; color:#0a0f1e; border:none;
+        font-family: 'Satoshi', sans-serif; font-size:17px; font-weight:600; cursor:pointer;
+        transition:background 0.2s, transform 0.15s;
+      }
+      .popup-btn-inv:hover { background:#e2e8f0; transform:translateY(-1px); }
+      .popup-btn-inv:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+      .popup-btn-skip-inv {
+        width:100%; padding:10px 16px; border-radius:100px;
+        background:transparent; color:rgba(255,255,255,0.4); border:1px solid rgba(255,255,255,0.08);
+        font-family: 'Space Grotesk', sans-serif; font-size:14px; font-weight:500; letter-spacing:0.3px; cursor:pointer;
+        transition:color 0.2s, border-color 0.2s; margin-top:4px;
+      }
+      .popup-btn-skip-inv:hover { color:rgba(255,255,255,0.65); border-color:rgba(255,255,255,0.18); }
+    </style>
+
+    <div class="popup-overlay-inv" id="popupInventosPage">
+      <div class="popup-card-inv">
+        <div class="popup-header-inv">
+          <h3 class="popup-title-inv" data-es="Una última pregunta" data-en="One quick thing">Una última pregunta</h3>
+          <p class="popup-desc-inv" data-es="¿Qué es lo más curioso que inventarías?" data-en="What's the most curious thing you'd invent?">¿Qué es lo más curioso que inventarías?</p>
+        </div>
+        <div class="popup-content">
+          <label class="popup-label-inv">
+            <input id="inputInventosPage" class="popup-input-inv" type="text" placeholder="Tu respuesta..." maxlength="100" />
+            <span class="popup-error-inv" id="errorInventosPage"></span>
+          </label>
+        </div>
+        <div class="popup-footer">
+          <button class="popup-btn-inv" onclick="submitPopupPage('popupInventosPage','inputInventosPage','errorInventosPage','inventos','popupInventosOk')">
+            <span data-es="Continuar" data-en="Continue">Continuar</span>
+          </button>
+          <button class="popup-btn-skip-inv" onclick="saltarPopupPage('popupInventosPage')">
+            <span data-es="Saltar" data-en="Skip">Saltar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Neon Grid Background -->
+    <canvas id="neonGrid" class="absolute inset-0 w-full h-full pointer-events-none bg-black" style="z-index: 0;"></canvas>
+
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      
+      <!-- Hero Title -->
+      <div class="text-center mb-24 animate-slide-up">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white font-serif"
+            data-es="Inventos" data-en="Inventions">
+          Inventos
+        </h1>
+        <p class="mt-4 md:mt-6 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
+           data-es="Insights, tendencias y visión sobre desarrollos. Análisis, casos y aprendizajes sobre prototipos y proyectos."
+           data-en="Insights, trends and vision on developments. Analysis, case studies and learnings about prototypes and projects.">
+          Insights, tendencias y visión sobre desarrollos. Análisis, casos y aprendizajes sobre prototipos y proyectos.
+        </p>
+      </div>
+
+      <!-- Container for alternating sections -->
+      <div class="flex flex-col gap-16 md:gap-32">
+        
+        <!-- Section 0: Text Left, Image Right (La moda de las páginas webs) -->
+        <section class="flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
+          <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight transition-colors" data-es="La moda de las páginas webs" data-en="The Web Design Trend">La moda de las páginas webs</h2>
+            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Luego del boom de la IA y las mejoras observadas en los modelos del mercado..." data-en="Following the AI boom...">
+              Luego del boom de la IA y las mejoras observadas en los modelos del mercado, entendí que esto permite una mayor facilidad para diseñar soluciones tecnológicas a medida para comercios que necesitan una presencia web con una finalidad específica. Mi objetivo es acercarles a estos comerciantes una solución personalizada según su necesidad concreta en ese momento.
+            </p>
+            <div class="pt-2">
+              <a href="webmoda.html" class="text-blue-400 hover:text-blue-300 relative z-10 font-bold transition-colors" data-es="Explorar →" data-en="Explore →">Explorar →</a>
+            </div>
+          </div>
+          <div class="w-full md:w-1/2 order-1 md:order-2">
+            <a href="webmoda.html" class="block relative z-10 overflow-hidden rounded-xl h-64 w-full group border border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <img src="Fotos/Portadad_de_webmoda.png" alt="La moda de las páginas webs" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                <span class="text-white font-semibold tracking-wide">Ver detalle</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Section 1: Image Left, Text Right (Mi primera página web) -->
+        <section class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16 group">
+          <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight transition-colors" data-es="Mi primera página web" data-en="My First Website">Mi primera página web</h2>
+            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Esta es mi primera página web..." data-en="This is my first website...">
+              Esta es mi primera página web que desarrollé para la materia Programación Web el 11/21/22, la cual me permitió incursionar en los lenguajes de programación y ver soluciones tecnológicas para negocios. Acá se verá un caso de un negocio de venta de alcohol para que la gente pueda pedirla a través de una web, destacándose que es responsive para desktop y celular. Vale recordar el contexto: no existía IA para resolver los problemas que surgían — había que interpretar y saber encontrar la mejor solución por uno mismo.
+            </p>
+            <div class="pt-2">
+              <a href="https://kons-pw-2022.vercel.app/Trabajo%20Final/index.html" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 relative z-10 font-bold transition-colors" data-es="Explorar →" data-en="Explore →">Explorar →</a>
+            </div>
+          </div>
+          <div class="w-full md:w-1/2 order-1 md:order-2">
+            <a href="https://kons-pw-2022.vercel.app/Trabajo%20Final/index.html" target="_blank" rel="noopener noreferrer" class="block relative z-10 overflow-hidden rounded-xl h-64 w-full group border border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <img src="Fotos/Mi primera pagina web.png" alt="Mi primera página web" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                <span class="text-white font-semibold tracking-wide">Ver detalle</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Section 2: Text Left, Image Right (Evolución del Diseño) -->
+        <section class="flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
+          <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
+            <h3 class="text-3xl font-bold mb-4 text-white relative z-10" data-es="Evolución del Diseño" data-en="Evolution of Design">Evolución del Diseño</h3>
+            <p class="text-gray-200 relative z-10" data-es="Verán un recorrido..." data-en="You will see...">
+              Verán un recorrido por el diseño gráfico y cómo este fue evolucionando gracias a las herramientas tecnológicas en cada momento histórico hasta el presente. Cabe destacar que todo este contenido fue creado con IA en abril de 2025.
+            </p>
+            <div class="pt-2">
+              <a href="invento-meme.html" class="text-blue-400 hover:text-blue-300 relative z-10 font-bold transition-colors" data-es="Explorar →" data-en="Explore →">Explorar →</a>
+            </div>
+          </div>
+          <div class="w-full md:w-1/2 order-1 md:order-2">
+            <a href="invento-meme.html" class="block relative z-10 overflow-hidden rounded-xl h-64 w-full group border border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300">
+                <img src="Fotos/MEME.jpg" alt="Portada del Proyecto Meme" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                    <span class="text-white font-semibold tracking-wide">Ver detalle</span>
+                </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Section 3: Cuadrante 4 — Efectos de scroll down (carousel) -->
+        <section style="width:100%;padding:0;position:relative;">
+          <style>
+            .q4{width:100%;padding:3rem 0 3.5rem;box-sizing:border-box;position:relative;}
+            .q4-header{display:flex;align-items:flex-start;margin-bottom:2.5rem;}
+            .q4-heading h2{font-size:26px;font-weight:700;color:#f0f0f0;margin:0;}
+            .q4-wrap{position:relative;}
+            .q4-arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,0.5);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background 0.2s;}
+            .q4-arrow:hover{background:rgba(255,255,255,0.15);}
+            .q4-arrow.left{left:-21px;}
+            .q4-arrow.right{right:-21px;}
+            .q4-arrow:disabled{opacity:0.2;cursor:default;}
+            .q4-outer{overflow:hidden;width:100%;}
+            .q4-track{display:flex;gap:18px;transition:transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94);}
+            .q4-card{flex:0 0 280px;height:360px;border-radius:18px;overflow:hidden;position:relative;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:#111;}
+            .q4-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;}
+            .q4-card:hover img{transform:scale(1.04);}
+            .q4-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 50%);opacity:0;transition:opacity 0.3s ease;display:flex;align-items:flex-end;padding:20px;}
+            .q4-card:hover .q4-card-overlay{opacity:1;}
+            .q4-card-overlay h3{font-size:17px;font-weight:700;color:#fff;margin:0;line-height:1.2;}
+            .q4-placeholder-bg{width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;}
+            .q4-placeholder-bg span{font-size:13px;color:#999;letter-spacing:1px;}
+            .q4-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;}
+            .q4-modal-backdrop.open{display:flex;}
+            .q4-modal{background:#111;border-radius:20px;max-width:600px;width:90%;overflow:hidden;border:1px solid rgba(255,255,255,0.12);position:relative;}
+            .q4-modal img{width:100%;height:280px;object-fit:cover;display:block;}
+            .q4-modal-body{padding:24px;}
+            .q4-modal-body h3{font-size:22px;font-weight:700;color:#f0f0f0;margin:0 0 10px 0;}
+            .q4-modal-body p{font-size:14px;color:rgba(255,255,255,0.6);margin:0 0 20px 0;line-height:1.6;}
+            .q4-modal-btn{display:inline-block;padding:10px 24px;background:#fff;color:#000;border-radius:30px;font-size:14px;font-weight:600;text-decoration:none;transition:opacity 0.2s;}
+            .q4-modal-btn:hover{opacity:0.85;}
+            .q4-modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+          </style>
+
+          <div class="q4">
+            <div class="q4-header">
+              <div class="q4-heading">
+                <h2>Efectos de scroll down</h2>
+              </div>
+            </div>
+            <div class="q4-wrap">
+              <button class="q4-arrow left" id="q4prev" disabled aria-label="Anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <div class="q4-outer">
+                <div class="q4-track" id="q4track">
+                  <div class="q4-card" onclick="q4OpenModal(0)"><img src="Fotos/foto_portada_de_cartas.jpg" alt="The Gravitational Card-Cascade"><div class="q4-card-overlay"><h3>The Gravitational Card-Cascade</h3></div></div>
+                  <div class="q4-card" onclick="q4OpenModal(1)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 2</h3></div></div>
+                  <div class="q4-card" onclick="q4OpenModal(2)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 3</h3></div></div>
+                  <div class="q4-card" onclick="q4OpenModal(3)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 4</h3></div></div>
+                  <div class="q4-card" onclick="q4OpenModal(4)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 5</h3></div></div>
+                </div>
+              </div>
+              <button class="q4-arrow right" id="q4next" aria-label="Siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+          </div>
+          <div class="q4-modal-backdrop" id="q4modal">
+            <div class="q4-modal" id="q4modalinner">
+              <button class="q4-modal-close" onclick="q4CloseModal()">×</button>
+              <img id="q4modal-img" src="" alt="">
+              <div class="q4-modal-body">
+                <h3 id="q4modal-title"></h3>
+                <p id="q4modal-desc"></p>
+                <a id="q4modal-link" href="#" class="q4-modal-btn">Ver proyecto →</a>
+              </div>
+            </div>
+          </div>
+          <script>
+            (function(){
+              const data = [
+                { title: "The Gravitational Card-Cascade", desc: "En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.", img: "Fotos/foto_portada_de_cartas.jpg", url: "card-cascade-scroll.html" },
+                { title: "Título 2", desc: "Descripción del proyecto 2. Próximamente.", img: "", url: "#" },
+                { title: "Título 3", desc: "Descripción del proyecto 3. Próximamente.", img: "", url: "#" },
+                { title: "Título 4", desc: "Descripción del proyecto 4. Próximamente.", img: "", url: "#" },
+                { title: "Título 5", desc: "Descripción del proyecto 5. Próximamente.", img: "", url: "#" }
+              ];
+              const tr = document.getElementById('q4track');
+              const pv = document.getElementById('q4prev');
+              const nx = document.getElementById('q4next');
+              const step = 298; const total = data.length; let cur = 0; let isTransitioning = false;
+              function getCards(){ return tr.querySelectorAll('.q4-card'); }
+              function cloneEdges(){
+                const cards = Array.from(getCards());
+                const clonesEnd = cards.slice(0,2).map(c=>{ const cl=c.cloneNode(true); cl.setAttribute('data-clone','true'); return cl; });
+                const clonesStart = cards.slice(-2).map(c=>{ const cl=c.cloneNode(true); cl.setAttribute('data-clone','true'); return cl; });
+                clonesEnd.forEach(c=>tr.appendChild(c));
+                clonesStart.reverse().forEach(c=>tr.insertBefore(c,tr.firstChild));
+                cur = 2; tr.style.transition = 'none'; tr.style.transform = 'translateX(-'+(cur*step)+'px)';
+              }
+              function upd(animate){
+                if(animate === false){ tr.style.transition = 'none'; } else { tr.style.transition = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94)'; }
+                tr.style.transform = 'translateX(-'+(cur*step)+'px)'; pv.disabled = false; nx.disabled = false;
+              }
+              cloneEdges();
+              const realTotal = tr.querySelectorAll('.q4-card').length;
+              nx.onclick = function(){ if(isTransitioning) return; isTransitioning = true; cur++; upd(true); };
+              pv.onclick = function(){ if(isTransitioning) return; isTransitioning = true; cur--; upd(true); };
+              tr.addEventListener('transitionend', function(){
+                isTransitioning = false; const clonesBefore = 2; const realEnd = clonesBefore + total - 1;
+                if(cur <= clonesBefore - 1){ cur = clonesBefore + total - (clonesBefore - cur); upd(false); }
+                else if(cur >= realEnd + 1){ cur = clonesBefore + (cur - realEnd - 1); upd(false); }
+              });
+              window.q4OpenModal = function(i){
+                const idx = i % total; const d = data[idx]; const imgEl = document.getElementById('q4modal-img');
+                imgEl.src = d.img || ''; imgEl.style.display = d.img ? 'block' : 'none';
+                document.getElementById('q4modal-title').textContent = d.title; document.getElementById('q4modal-desc').textContent = d.desc;
+                const link = document.getElementById('q4modal-link'); link.href = d.url; link.onclick = d.url === '#' ? (e)=>e.preventDefault() : null;
+                document.getElementById('q4modal').classList.add('open');
+              };
+              window.q4CloseModal = function(){ document.getElementById('q4modal').classList.remove('open'); };
+              document.getElementById('q4modal').addEventListener('click', function(e){ if(e.target === this) q4CloseModal(); });
+            })();
+          </script>
+        </section>
+
+        <!-- Section 4: Text Left, Image Right -->
+        <section class="flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
+          <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight transition-colors" data-es="Simulación del Océano" data-en="Ocean Simulation">Simulación del Océano</h2>
+            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Vista en el medio del océano, disfrútalo." data-en="A view from the middle of the ocean, enjoy it.">Vista en el medio del océano, disfrútalo.</p>
+            <div class="pt-2">
+              <a href="oceano.html" class="text-blue-400 hover:text-blue-300 relative z-10 font-bold transition-colors" data-es="Explorar →" data-en="Explore →">Explorar →</a>
+            </div>
+          </div>
+          <div class="w-full md:w-1/2 order-1 md:order-2">
+            <div onclick="window.location.href='oceano.html'" style="position:relative;width:100%;aspect-ratio:3/2;border-radius:0.75rem;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);cursor:pointer;transition:box-shadow 0.5s ease,border-color 0.3s ease;background-image:linear-gradient(rgba(0,229,255,0.12) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.12) 1px,transparent 1px);background-size:32px 32px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.boxShadow='0 0 30px rgba(0,229,255,0.35),0 25px 50px -12px rgba(0,0,0,0.5)';this.style.borderColor='rgba(0,229,255,0.5)';this.querySelector('.ocean-hover-text').style.opacity='1';this.querySelector('.ocean-main-text').style.opacity='0';" onmouseout="this.style.boxShadow='0 25px 50px -12px rgba(0,0,0,0.5)';this.style.borderColor='rgba(255,255,255,0.1)';this.querySelector('.ocean-hover-text').style.opacity='0';this.querySelector('.ocean-main-text').style.opacity='1';">
+              <span class="ocean-main-text" style="color:#ffffff;font-size:1.25rem;font-weight:700;letter-spacing:0.05em;text-align:center;transition:opacity 0.3s ease;pointer-events:none;">🌊 SIMULACIÓN OCEÁNICA</span>
+              <span class="ocean-hover-text" data-es="Haz clic para explorar" data-en="Click to explore" style="position:absolute;color:#ffffff;font-size:1rem;font-weight:500;text-align:center;opacity:0;transition:opacity 0.3s ease;pointer-events:none;">Haz clic para explorar</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    
+    <script>
+      (function() {
+        const canvas = document.getElementById('neonGrid');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        let width, height; const mouse = { x: -1000, y: -1000 }; let time = 0;
+        const config = { gridSize: 50, panSpeed: 0.5, baseColor: 'rgba(0, 255, 255, 0.1)', glowColor: 'rgba(0, 255, 255, 0.4)', glowWidth: 2, lightRadius: 350 };
+        function resize() {
+          const rect = canvas.parentElement.getBoundingClientRect();
+          width = canvas.parentElement.clientWidth; height = canvas.parentElement.clientHeight;
+          canvas.width = width; canvas.height = height;
+        }
+        window.addEventListener('resize', resize); resize();
+        canvas.parentElement.addEventListener('mousemove', (e) => {
+          const rect = canvas.parentElement.getBoundingClientRect();
+          mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top;
+        });
+        canvas.parentElement.addEventListener('mouseout', () => { mouse.x = -1000; mouse.y = -1000; });
+        function draw() {
+          ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, width, height);
+          time += config.panSpeed; const offsetX = (time % config.gridSize); const offsetY = (time % config.gridSize);
+          ctx.lineWidth = 1; ctx.beginPath(); ctx.strokeStyle = config.baseColor;
+          for(let x = offsetX; x < width; x += config.gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, height); }
+          for(let y = offsetY; y < height; y += config.gridSize) { ctx.moveTo(0, y); ctx.lineTo(width, y); }
+          ctx.stroke();
+          if (mouse.x > -100 && mouse.x < width + 100 && mouse.y > -100 && mouse.y < height + 100) {
+            ctx.save();
+            const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, config.lightRadius);
+            gradient.addColorStop(0, config.glowColor); gradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+            ctx.globalCompositeOperation = 'screen'; ctx.beginPath(); ctx.strokeStyle = gradient; ctx.lineWidth = config.glowWidth;
+            for(let x = offsetX; x < width; x += config.gridSize) { if (Math.abs(x - mouse.x) < config.lightRadius) { ctx.moveTo(x, Math.max(0, mouse.y - config.lightRadius)); ctx.lineTo(x, Math.min(height, mouse.y + config.lightRadius)); } }
+            for(let y = offsetY; y < height; y += config.gridSize) { if (Math.abs(y - mouse.y) < config.lightRadius) { ctx.moveTo(Math.max(0, mouse.x - config.lightRadius), y); ctx.lineTo(Math.min(width, mouse.x + config.lightRadius), y); } }
+            ctx.stroke(); ctx.shadowBlur = 15; ctx.shadowColor = 'rgba(0, 255, 255, 0.8)'; ctx.stroke(); ctx.restore();
+          }
+          ctx.beginPath();
+          for(let x = offsetX; x < width; x += config.gridSize) {
+            for(let y = offsetY; y < height; y += config.gridSize) {
+              const dist = Math.hypot(x - mouse.x, y - mouse.y);
+              if (dist < config.lightRadius) {
+                const intensity = 1 - (dist / config.lightRadius);
+                ctx.fillStyle = `rgba(0, 255, 255, ${0.1 + intensity * 0.9})`; ctx.shadowBlur = intensity * 15; ctx.shadowColor = 'rgba(0, 255, 255, 1)'; ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+              } else { ctx.shadowBlur = 0; ctx.fillStyle = config.baseColor; ctx.fillRect(x - 1, y - 1, 2, 2); }
+            }
+          }
+          const vignette = ctx.createRadialGradient(width/2, height/2, height*0.3, width/2, height/2, Math.max(width, height) * 0.75);
+          vignette.addColorStop(0, 'rgba(0,0,0,0)'); vignette.addColorStop(1, 'rgba(0,0,0,0.9)');
+          ctx.fillStyle = vignette; ctx.fillRect(0,0,width,height);
+          requestAnimationFrame(draw);
+        }
+        draw();
+      })();
+    </script>
+    <script>
+      (function() {
+        const flag = localStorage.getItem('popupInventosOk');
+        if (flag === 'true') {
+          const overlay = document.getElementById('popupInventosPage');
+          if (overlay) overlay.classList.add('hidden');
+          return;
+        }
+        const lang = localStorage.getItem('idioma') || 'es';
+        document.querySelectorAll('#popupInventosPage [data-es]').forEach(el => { el.textContent = lang === 'es' ? el.dataset.es : el.dataset.en; });
+        const input = document.getElementById('inputInventosPage');
+        if (input) {
+          input.placeholder = lang === 'es' ? 'Tu respuesta...' : 'Your answer...';
+          input.addEventListener('keydown', e => { if (e.key === 'Enter') submitPopupPage('popupInventosPage','inputInventosPage','errorInventosPage','inventos','popupInventosOk'); });
+        }
+      })();
+      function saltarPopupPage(popupId) {
+        const overlay = document.getElementById(popupId); if (!overlay) return;
+        overlay.style.transition = 'opacity 0.3s ease'; overlay.style.opacity = '0';
+        setTimeout(() => { overlay.classList.add('hidden'); overlay.style.opacity = ''; }, 300);
+      }
+      async function submitPopupPage(popupId, inputId, errorId, tipo, flagKey) {
+        const input = document.getElementById(inputId); const error = document.getElementById(errorId);
+        const lang  = localStorage.getItem('idioma') || 'es'; const value = input.value.trim(); const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/.test(value);
+        if (!value) { error.textContent = lang === 'es' ? 'Por favor escribí tu respuesta.' : 'Please write your answer.'; input.classList.add('error'); return; }
+        if (!soloLetras) { error.textContent = lang === 'es' ? 'Solo se permiten letras.' : 'Letters only.'; input.classList.add('error'); return; }
+        if (value.length > 100) { error.textContent = lang === 'es' ? 'La respuesta no puede tener más de 100 caracteres.' : 'Answer cannot exceed 100 characters.'; input.classList.add('error'); return; }
+        if (value.length < 2) { error.textContent = lang === 'es' ? 'La respuesta es muy corta.' : 'Answer is too short.'; input.classList.add('error'); return; }
+        input.classList.remove('error'); error.textContent = '';
+        const btn = document.querySelector('#' + popupId + ' .popup-btn-inv');
+        if (btn) { btn.disabled = true; btn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...'; }
+        const ENDPOINT = 'https://script.google.com/macros/s/AKfycbw9Sj9a45ojREEUICDwt9MsVJ-4NzqO3UgMXA1Vkw0RGjF30BK4SBSmE-oAZEoe-0dlKw/exec';
+        const nombreGuardado = localStorage.getItem('userName') || 'Anónimo';
+        try { await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tipo, nombre: nombreGuardado, respuesta: value }) }); } catch(err) {}
+        await new Promise(r => setTimeout(r, 800)); localStorage.setItem(flagKey, 'true'); saltarPopupPage(popupId);
+      }
+    </script>
   </section>
 
   <!-- Bloque 5 — Mi Perfil -->
-  <section id="miperfil" style="position:relative; background-color:#080810;">
+  <section id="miperfil" style="position:relative; overflow:hidden; background-color:#080810;">
+    <style>
+      @keyframes gridMovePerf { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
+      @keyframes lineMovePerf { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+      @keyframes cornerLineAnimationPerf { 0%, 100% { opacity: 1; stroke-width: 4px; } 50% { opacity: 0.5; stroke-width: 2px; } }
+
+      #miperfil [data-i18n="hero-title"] {
+        font-family: 'Cormorant Garamond', 'Georgia', serif !important;
+        font-size: 110px !important; font-weight: 700 !important; line-height: 0.9 !important;
+        letter-spacing: -4px !important; color: #F5F3EE !important;
+      }
+      @media (max-width: 430px) { #miperfil [data-i18n="hero-title"] { font-size: 72px !important; letter-spacing: -3px !important; line-height: 0.92 !important; } }
+      @media (max-width: 375px) { #miperfil [data-i18n="hero-title"] { font-size: 62px !important; letter-spacing: -2px !important; } }
+
+      #miperfil [data-i18n="hero-desc"] {
+        font-family: 'Inter Tight', sans-serif !important; font-size: 28px !important;
+        font-weight: 400 !important; line-height: 1.7 !important; letter-spacing: -0.3px !important; color: rgba(255,255,255,0.82) !important;
+      }
+
+      #miperfil [data-i18n="articles-title"] {
+        font-family: 'General Sans', 'system-ui', sans-serif !important; font-size: 56px !important; font-weight: 700 !important; letter-spacing: -2px !important;
+      }
+
+      #miperfil #articles-container h3 { font-family: 'Satoshi', 'system-ui', sans-serif !important; font-size: 34px !important; font-weight: 700 !important; letter-spacing: -1px !important; line-height: 1.1 !important; }
+      #miperfil #articles-container p { font-family: 'Inter', sans-serif !important; font-size: 18px !important; font-weight: 400 !important; line-height: 1.75 !important; color: rgba(255,255,255,0.72) !important; }
+
+      #miperfil [data-i18n="chat-title"] { font-family: 'Cormorant Garamond', 'Georgia', serif !important; font-size: 72px !important; font-weight: 700 !important; letter-spacing: -2px !important; line-height: 1 !important; }
+
+      #miperfil button, #miperfil input { font-family: 'Inter', sans-serif !important; font-weight: 500 !important; }
+
+      .popup-overlay-perf {
+        position: fixed; inset: 0; z-index: 9999; background: rgba(5, 10, 24, 0.92);
+        backdrop-filter: blur(16px); display: flex; align-items: center; justify-content: center; padding: 24px;
+      }
+      .popup-overlay-perf.hidden { display: none; }
+      .popup-card-perf {
+        width: 100%; max-width: 400px; background: #0f1a2e; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 32px; padding: 32px; display: flex; flex-direction: column; gap: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: popupInPerf 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      }
+      @keyframes popupInPerf { from { opacity:0; transform:translateY(24px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+      .popup-header-perf { display:flex; flex-direction:column; gap:4px; }
+      .popup-title-perf { font-family: 'Satoshi', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; color: #F5F7FA; margin: 0; }
+      .popup-desc-perf { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.7; color: rgba(255,255,255,0.72); margin: 0; }
+      .popup-label-perf { display:flex; flex-direction:column; gap:8px; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+      .popup-input-perf { height:48px; border-radius:14px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); padding:0 16px; font-family: 'Inter', sans-serif; font-size:17px; font-weight:500; color:rgba(255,255,255,0.92); outline:none; transition:border-color 0.2s; }
+      .popup-input-perf::placeholder { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 400; color: rgba(255,255,255,0.38); }
+      .popup-input-perf:focus { border-color:#4a90d9; }
+      .popup-input-perf.error { border-color:#ef4444; }
+      .popup-error-perf { font-family: 'Inter', sans-serif; font-size:13px; color:#ef4444; min-height:16px; display:block; }
+      .popup-btn-perf { width:100%; padding:14px 16px; border-radius:100px; background:#F5F7FA; color:#0a0f1e; border:none; font-family: 'Satoshi', sans-serif; font-size:17px; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.15s; }
+      .popup-btn-perf:hover { background:#e2e8f0; transform:translateY(-1px); }
+      .popup-btn-perf:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+      
+      /* Global Animated Background for Mi Perfil */
+      #global-bg-perf { position: absolute; inset: 0; z-index: 0; background: #000; overflow: hidden; pointer-events: none; }
+      .meteor { position: absolute; width: 2px; height: 100px; background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%); transform: rotate(45deg); opacity: 0; animation: meteorFallPerf linear infinite; }
+      @keyframes meteorFallPerf { 0% { transform: translateY(-200px) translateX(200px) rotate(45deg); opacity: 1; } 100% { transform: translateY(100vh) translateX(-100vh) rotate(45deg); opacity: 0; } }
+    </style>
+
+    <div class="popup-overlay-perf" id="popupPerfilOverlay">
+      <div class="popup-card-perf">
+        <div class="popup-header-perf">
+          <h3 class="popup-title-perf">One quick thing</h3>
+          <p class="popup-desc-perf">Leave your name and email to continue</p>
+        </div>
+        <div class="popup-content">
+          <label class="popup-label-perf">
+            Name
+            <input id="perfilNombre" class="popup-input-perf" type="text" placeholder="Your name..." maxlength="20" />
+            <span class="popup-error-perf" id="perfilErrorNombre"></span>
+          </label>
+          <label class="popup-label-perf" style="margin-top:12px">
+            Email
+            <input id="perfilEmail" class="popup-input-perf" type="email" placeholder="your@email.com" />
+            <span class="popup-error-perf" id="perfilErrorEmail"></span>
+          </label>
+        </div>
+        <div class="popup-footer">
+          <button class="popup-btn-perf" onclick="submitPerfilPopup()">Continue</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="global-bg-perf">
+      <div class="absolute inset-[-50px] w-[calc(100%+100px)] h-[calc(100%+100px)] bg-[linear-gradient(rgba(0,212,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.07)_1px,transparent_1px)] bg-[length:50px_50px]" style="animation: gridMovePerf 3s linear infinite;"></div>
+      <div class="absolute top-[10%] left-0 w-full h-[2px] opacity-70" style="background: linear-gradient(90deg, transparent 0%, #007bff 20%, #00d4ff 50%, #007bff 80%, transparent 100%); background-size: 200% 100%; animation: lineMovePerf 4s linear infinite;"></div>
+      <div class="absolute top-[30%] left-0 w-full h-[2px] opacity-70" style="background: linear-gradient(90deg, transparent 0%, #007bff 20%, #00d4ff 50%, #007bff 80%, transparent 100%); background-size: 200% 100%; animation: lineMovePerf 5s linear infinite reverse;"></div>
+      <div class="absolute top-[50%] left-0 w-full h-[2px] opacity-70" style="background: linear-gradient(90deg, transparent 0%, #007bff 20%, #00d4ff 50%, #007bff 80%, transparent 100%); background-size: 200% 100%; animation: lineMovePerf 6s linear infinite;"></div>
+      <div class="absolute top-[70%] left-0 w-full h-[2px] opacity-70" style="background: linear-gradient(90deg, transparent 0%, #007bff 20%, #00d4ff 50%, #007bff 80%, transparent 100%); background-size: 200% 100%; animation: lineMovePerf 4.5s linear infinite reverse;"></div>
+      <div class="absolute top-[90%] left-0 w-full h-[2px] opacity-70" style="background: linear-gradient(90deg, transparent 0%, #007bff 20%, #00d4ff 50%, #007bff 80%, transparent 100%); background-size: 200% 100%; animation: lineMovePerf 5.5s linear infinite;"></div>
+      <svg class="absolute top-4 left-4 w-12 h-12" style="animation: cornerLineAnimationPerf 3s ease-in-out infinite;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L0 50 M0 0 L50 0" stroke="#00d4ff" stroke-width="4"/></svg>
+      <svg class="absolute bottom-4 right-4 w-12 h-12 transform rotate-180" style="animation: cornerLineAnimationPerf 3s ease-in-out infinite;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L0 50 M0 0 L50 0" stroke="#00d4ff" stroke-width="4"/></svg>
+    </div>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20 animate-slide-up">
+        <div class="relative h-[400px] md:h-[600px] rounded-[32px] overflow-hidden order-last md:order-first shadow-xl">
+          <img src="Fotos/1°.jpg" alt="Foto principal" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+        </div>
+        <div class="px-4 md:px-8">
+          <h1 data-i18n="hero-title" class="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-8 font-serif leading-[1.1] text-white transition-colors duration-300">
+            Pienso en sistemas. Ejecuto en resultados.
+          </h1>
+          <p data-i18n="hero-desc" class="text-lg text-white/70 mb-10 leading-relaxed max-w-lg transition-colors duration-300">
+            Soy Konstantino Ambrossenkov — graduado del ITBA, trabajo en datos y operaciones. Explorá mi trayectoria y proyectos acá.
+          </p>
+        </div>
+      </section>
+
+      <section id="articles" class="py-12">
+        <div class="flex items-center justify-between mb-12 animate-slide-up" style="animation-delay: 200ms;">
+          <h2 data-i18n="articles-title" class="text-3xl md:text-4xl font-bold tracking-tight text-white transition-colors duration-300">Artículos Destacados</h2>
+        </div>
+        <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div onclick="if(typeof openCVModal==='function')openCVModal()" data-open-cv-modal="true" role="button" tabindex="0" class="block bg-[#111] rounded-2xl overflow-hidden border border-white/10 shadow-sm hover:shadow-md transition-all duration-300 animate-slide-up group cursor-pointer" style="animation-delay: 200ms;">
+            <div class="h-48 overflow-hidden relative">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a1628 0%,#0f2340 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span data-es="CV" data-en="CV" style="font-size:11px;font-weight:700;letter-spacing:2px;color:#93c5fd;">CV</span>
+              </div>
+            </div>
+            <div class="p-6 flex flex-col justify-between h-[calc(100%-12rem)]">
+              <div>
+                <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-wider text-[#3b82f6]" data-es="MI PERFIL" data-en="MY PROFILE">MI PERFIL</span><span class="text-xs text-white/50 ml-2">• 03-may-2026</span></div>
+                <h3 class="text-xl font-bold mb-2 tracking-tight group-hover:text-[#3b82f6] text-white transition-colors" data-es="Mi CV" data-en="My CV">Mi CV</h3>
+                <p class="text-white/70 line-clamp-3 text-sm leading-relaxed" data-es="Ingresá a mi CV en castellano o en inglés, según prefieras." data-en="Access my CV in Spanish or English, whichever you prefer.">Ingresá a mi CV en castellano o en inglés, según prefieras.</p>
+              </div>
+            </div>
+          </div>
+          <a href="curiosidades.html" class="block bg-[#111] rounded-2xl overflow-hidden border border-white/10 shadow-sm hover:shadow-md transition-all duration-300 animate-slide-up group" style="animation-delay: 300ms;">
+            <div class="h-48 overflow-hidden relative">
+              <img src="Fotos/foto_de_recibida.jpg" alt="Finalización de mi cursada en la carrera" class="w-full h-full object-contain bg-black group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="p-6 flex flex-col justify-between h-[calc(100%-12rem)]">
+              <div>
+                <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-wider text-[#3b82f6]"></span><span class="text-xs text-white/50 ml-2">• 12-dic-2024</span></div>
+                <h3 class="text-xl font-bold mb-2 tracking-tight group-hover:text-[#3b82f6] text-white transition-colors" data-es="Finalización de mi cursada en la carrera" data-en="Completion of my University Degree">Finalización de mi cursada en la carrera</h3>
+                <p class="text-white/70 line-clamp-3 text-sm leading-relaxed" data-es="Luego de un recorrido de 4 años y medio en la carrera de Lic. en gestión de negocios pude finalizarla en tiempo y en forma por la beca obtenida" data-en="After 4 and a half years in the Business Management degree, I was able to complete it on time thanks to the scholarship I received.">Luego de un recorrido de 4 años y medio en la carrera de Lic. en gestión de negocios pude finalizarla en tiempo y en forma por la beca obtenida</p>
+              </div>
+            </div>
+          </a>
+          <a href="webmoda.html" target="_blank" rel="noopener noreferrer" class="block bg-[#111] rounded-2xl overflow-hidden border border-white/10 shadow-sm hover:shadow-md transition-all duration-300 animate-slide-up group" style="animation-delay: 400ms;">
+            <div class="h-48 overflow-hidden relative">
+              <img src="Fotos/qr de casa lupi.jpeg" alt="QR Casa Lupi" style="width:100%;height:100%;object-fit:contain;padding:16px;">
+            </div>
+            <div class="p-6 flex flex-col justify-between h-[calc(100%-12rem)]">
+              <div>
+                <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-wider text-[#3b82f6]" data-es="INVENTOS" data-en="PROJECTS">INVENTOS</span><span class="text-xs text-white/50 ml-2">• 20-mar-2025</span></div>
+                <h3 class="text-xl font-bold mb-2 tracking-tight group-hover:text-[#3b82f6] text-white transition-colors" data-es="Kiosco Casa Lupi" data-en="Kiosco Casa Lupi">Kiosco Casa Lupi</h3>
+                <p class="text-white/70 line-clamp-3 text-sm leading-relaxed" data-es="Kiosco de unos conocidos muy cercanos míos que les brindé una ayuda tecnológica y administrativa para mejorar su marca familiar." data-en="A kiosk belonging to close acquaintances of mine, for whom I provided technological and administrative support to strengthen their family brand.">Kiosco de unos conocidos muy cercanos míos que les brindé una ayuda tecnológica y administrativa para mejorar su marca familiar.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="my-20 rounded-[2.5rem] bg-[#111] p-8 md:p-16 text-center animate-scale-in border border-white/10 transition-colors duration-300 shadow-sm">
+        <div class="max-w-4xl mx-auto space-y-10">
+          <div class="space-y-4">
+            <h2 data-i18n="chat-title" class="text-4xl md:text-5xl font-bold tracking-tight text-white">¿Querés Charlar?</h2>
+            <p data-i18n="chat-desc" class="text-xl text-white/50 leading-relaxed">mandame tu email o escribime por wpp</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-black/50 p-6 md:p-10 rounded-3xl border border-white/10 shadow-inner">
+            <div class="flex flex-col gap-1 w-full">
+              <form id="email-form" class="flex flex-col sm:flex-row gap-4 w-full" action="https://api.web3forms.com/submit" method="POST">
+                <input type="hidden" name="access_key" value="477b2e2f-0dd9-4167-b205-2e239525342b">
+                <input id="email-input" type="email" name="email" required data-i18n-placeholder="chat-placeholder" placeholder="Tu correo electrónico" class="flex-1 px-6 py-4 rounded-full border border-white/10 bg-black focus:outline-none focus:ring-2 focus:ring-[#3b82f6] transition-all text-white" />
+                <button type="submit" data-i18n="chat-btn-send" class="px-8 py-4 rounded-full bg-[#3b82f6] text-white font-medium hover:opacity-90 shadow hover:-translate-y-1 transition-all cursor-pointer">enviar</button>
+              </form>
+              <div id="email-error" style="display:none; color:#ef4444; font-size:0.875rem; padding-left:1.5rem;"></div>
+            </div>
+            <div class="flex justify-center w-full">
+              <a href="https://wa.me/541134111875?text=Hola%20Konstantino,%20te%20contacto%20desde%20tu%20sitio%20web" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-10 py-4 rounded-full bg-[#25D366] text-white font-medium hover:bg-[#128C7E] shadow hover:-translate-y-1 transition-all w-full sm:w-auto justify-center cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                <span data-i18n="chat-btn-wpp">escribir</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        if (typeof articlesList !== 'undefined') {
+          var kiosco = { id: 7, title: "Kiosco Casa Lupi", excerpt: "Kiosco de unos conocidos muy cercanos míos que les brindé una ayuda tecnológica y administrativa para mejorar su marca familiar.", category: "INVENTOS", date: "20-mar-2025", imageUrl: null };
+          ['en', 'es'].forEach(function (lang) { var arr = articlesList[lang]; if(arr){ var i = arr.findIndex(function (a) { return a.id === 1; }); if (i !== -1) arr.splice(i, 1, kiosco); } });
+        }
+        if (typeof renderArticles === 'function') {
+          var _orig = renderArticles;
+          window.renderArticles = function () {
+            _orig.apply(this, arguments);
+            var container = document.getElementById('articles-container');
+            if (!container) return;
+            var card = container.children[2];
+            if (!card) return;
+            if (card.tagName === 'A') { card.href = 'webmoda.html'; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
+            var imgArea = card.querySelector('.h-48');
+            if (imgArea) { imgArea.innerHTML = '<img src="Fotos/qr de casa lupi.jpeg" alt="QR Casa Lupi" style="width:100%;height:100%;object-fit:contain;padding:16px;">'; }
+          };
+        }
+      })();
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const bgContainer = document.getElementById('global-bg-perf');
+        if (!bgContainer) return;
+        const meteorCount = 30;
+        for (let i = 0; i < meteorCount; i++) {
+          const span = document.createElement('span'); span.className = 'meteor';
+          span.style.top = `${Math.floor(Math.random() * 100) - 50}%`; span.style.left = `${Math.floor(Math.random() * 150)}%`;
+          span.style.animationDelay = `${Math.random() * 5 + 0.2}s`; span.style.animationDuration = `${Math.random() * 6 + 3}s`;
+          bgContainer.appendChild(span);
+        }
+      });
+    </script>
+    <script>
+      (function () {
+        var EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        var INJECTION_PATTERNS = [/%0a/i, /%0d/i, /\n/, /\r/, /Cc:/i, /Bcc:/i, /To:/i, /Content-Type:/i];
+        function sanitizeInput(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;'); }
+        function showError(msg) { var el = document.getElementById('email-error'); if (el) { el.textContent = msg; el.style.color = '#ef4444'; el.style.display = 'block'; } }
+        function showSuccess(msg) { var el = document.getElementById('email-error'); if (el) { el.textContent = msg; el.style.color = '#22c55e'; el.style.display = 'block'; } }
+        function clearMessage() { var el = document.getElementById('email-error'); if (el) { el.textContent = ''; el.style.display = 'none'; } }
+        document.addEventListener('DOMContentLoaded', function () {
+          var form = document.getElementById('email-form'); var input = document.getElementById('email-input');
+          if (!form || !input) return;
+          input.addEventListener('input', clearMessage);
+          form.addEventListener('submit', function (e) {
+            e.preventDefault(); var raw = input.value;
+            if (raw.length > 254) { showError('Por favor ingresá un email válido.'); return; }
+            for (var i = 0; i < INJECTION_PATTERNS.length; i++) { if (INJECTION_PATTERNS[i].test(raw)) { showError('Por favor ingresá un email válido.'); return; } }
+            if (!EMAIL_REGEX.test(raw)) { showError('Por favor ingresá un email válido.'); return; }
+            var sanitized = sanitizeInput(raw); var btn = form.querySelector('button[type="submit"]'); if (btn) btn.disabled = true;
+            fetch('/api/contacto', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: sanitized }) })
+            .then(function (res) { if (res.status === 200) { showSuccess('¡Gracias! Te contactaré pronto.'); input.value = ''; } else if (res.status === 429) { showError('Demasiados intentos. Esperá unos minutos.'); } else { showError('Algo salió mal. Intentá de nuevo.'); } })
+            .catch(function () { showError('Algo salió mal. Intentá de nuevo.'); })
+            .finally(function () { if (btn) btn.disabled = false; });
+          });
+        });
+      })();
+    </script>
+    <script>
+      (function() {
+        const desbloqueado = localStorage.getItem('perfilDesbloqueado');
+        if (desbloqueado === 'true') { const overlay = document.getElementById('popupPerfilOverlay'); if (overlay) overlay.classList.add('hidden'); return; }
+      })();
+      async function submitPerfilPopup() {
+        const nombreInput = document.getElementById('perfilNombre'); const emailInput  = document.getElementById('perfilEmail');
+        const errorNombre = document.getElementById('perfilErrorNombre'); const errorEmail  = document.getElementById('perfilErrorEmail');
+        const nombre = nombreInput.value.trim(); const email  = emailInput.value.trim();
+        const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/.test(nombre);
+        function validarEmail(email) {
+          const formatoBase = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email); if (!formatoBase) return false;
+          const dominio = email.split('@')[1].toLowerCase();
+          const dominiosPermitidos = [ 'gmail.com', 'hotmail.com','hotmail.es','hotmail.com.ar', 'outlook.com','outlook.es','outlook.com.ar', 'live.com','live.com.ar','msn.com', 'yahoo.com','yahoo.es','yahoo.com.ar','ymail.com', 'icloud.com','me.com','mac.com', 'protonmail.com','proton.me', 'zoho.com','mail.com','aol.com', 'gmx.com','gmx.net', 'fibertel.com.ar','speedy.com.ar', 'arnet.com.ar','ciudad.com.ar', 'itba.edu.ar','uba.ar','unc.edu.ar', 'udesa.edu.ar','austral.edu.ar', 'uade.edu.ar','utn.edu.ar', 'unlp.edu.ar','unsam.edu.ar', 'mit.edu','stanford.edu','harvard.edu', 'ox.ac.uk','cam.ac.uk' ];
+          return dominiosPermitidos.includes(dominio);
+        }
+        let hayError = false;
+        if (!nombre) { errorNombre.textContent = 'Please enter your name.'; nombreInput.classList.add('error'); hayError = true; }
+        else if (!soloLetras) { errorNombre.textContent = 'Letters only, no numbers or symbols.'; nombreInput.classList.add('error'); hayError = true; }
+        else if (nombre.length > 20) { errorNombre.textContent = 'Name cannot exceed 20 characters.'; nombreInput.classList.add('error'); hayError = true; }
+        else if (nombre.length < 2) { errorNombre.textContent = 'Name is too short.'; nombreInput.classList.add('error'); hayError = true; }
+        else { errorNombre.textContent = ''; nombreInput.classList.remove('error'); }
+        if (!email) { errorEmail.textContent = 'Please enter your email.'; emailInput.classList.add('error'); hayError = true; }
+        else if (!validarEmail(email)) { errorEmail.textContent = 'Use a recognized provider email.'; emailInput.classList.add('error'); hayError = true; }
+        else { errorEmail.textContent = ''; emailInput.classList.remove('error'); }
+        if (hayError) return;
+        const btn = document.querySelector('#popupPerfilOverlay .popup-btn-perf'); if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+        const ENDPOINT = 'https://script.google.com/macros/s/AKfycbw9Sj9a45ojREEUICDwt9MsVJ-4NzqO3UgMXA1Vkw0RGjF30BK4SBSmE-oAZEoe-0dlKw/exec';
+        const nombreGuardado = localStorage.getItem('userName') || 'Anónimo';
+        try { await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tipo: 'quiensoy', nombre: nombreGuardado, email: email }) }); } catch(err) {}
+        await new Promise(resolve => setTimeout(resolve, 800)); localStorage.setItem('perfilDesbloqueado', 'true');
+        const overlay = document.getElementById('popupPerfilOverlay'); overlay.style.transition = 'opacity 0.3s ease'; overlay.style.opacity = '0';
+        setTimeout(() => { overlay.classList.add('hidden'); overlay.style.opacity = ''; }, 300);
+      }
+      document.addEventListener('DOMContentLoaded', () => { ['perfilNombre', 'perfilEmail'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') submitPerfilPopup(); }); }); });
+    </script>
   </section>
 
   <!-- Footer — Contacto -->
-  <footer id="contacto">
+  <footer id="contacto" class="relative z-10 border-t border-white/10 mt-16 bg-[#111] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col items-center gap-10">
+      <div class="w-full text-center md:text-left">
+        <h3 data-i18n="ft-contact-title" class="text-2xl font-bold text-white">Contactame</h3>
+      </div>
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full">
+        <a href="mailto:k.ambrossenkov@gmail.com" class="flex items-center gap-3 text-white hover:text-[#3b82f6] transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span class="font-medium text-lg">k.ambrossenkov@gmail.com</span>
+        </a>
+        <a href="https://www.instagram.com/konsta_ambrossenkov/?__d=1" target="_blank" class="flex items-center gap-3 text-white hover:text-[#3b82f6] transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+          <span class="sr-only">Instagram</span>
+        </a>
+        <a href="https://www.linkedin.com/in/konstantino-ambrossenkov/" target="_blank" class="flex items-center gap-3 text-white hover:text-[#3b82f6] transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+          <span class="sr-only">LinkedIn</span>
+        </a>
+      </div>
+      <div class="mt-4">
+        <img src="Fotos/firma AK.jfif" alt="Firma AK" class="h-16 object-contain" onerror="this.outerHTML='<span class=\'text-2xl font-serif italic text-white opacity-70\'>Firma AK</span>'" />
+      </div>
+      <div class="pt-8 w-full border-t border-white/10 text-center text-white/50 transition-colors duration-300">
+        <p data-i18n="ft-help" class="font-medium text-lg">Estoy para ayudar</p>
+      </div>
+    </div>
   </footer>
+
+  <!-- CV Modal -->
+  <div id="cv-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden" role="dialog" aria-modal="true" aria-labelledby="cv-modal-title">
+    <div id="cv-modal-overlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="if(typeof closeCVModal==='function')closeCVModal()"></div>
+    <div class="relative z-10 bg-[#111] border border-white/10 rounded-2xl p-8 max-w-lg w-full mx-4 shadow-2xl">
+      <button id="cv-modal-close" onclick="if(typeof closeCVModal==='function')closeCVModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <h2 id="cv-modal-title" class="text-2xl font-bold font-serif text-white mb-2">Mi Currículum Vitae</h2>
+      <p class="text-white/50 text-sm mb-8">Lic. en Gestión de Negocios · Analista de Negocios</p>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-black/50 hover:border-[#3b82f6]/50 transition-colors">
+          <div>
+            <span class="block text-xs font-bold uppercase tracking-wider text-[#3b82f6] mb-1">IDIOMA</span>
+            <span class="text-base font-medium text-white">CV en Español</span>
+          </div>
+          <a href="./cv_konstantino_es_.pdf" target="_blank" rel="noopener noreferrer" class="px-5 py-2 rounded-full bg-[#3b82f6] text-white font-medium hover:opacity-90 transition-all text-sm">Abrir</a>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-black/50 hover:border-[#3b82f6]/50 transition-colors">
+          <div>
+            <span class="block text-xs font-bold uppercase tracking-wider text-[#3b82f6] mb-1">IDIOMA</span>
+            <span class="text-base font-medium text-white">CV in English</span>
+          </div>
+          <a href="./cv_konstantino_en_.pdf" target="_blank" rel="noopener noreferrer" class="px-5 py-2 rounded-full bg-[#3b82f6] text-white font-medium hover:opacity-90 transition-all text-sm">Abrir</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.openCVModal = function() {
+      const modal = document.getElementById('cv-modal');
+      if (modal) modal.classList.remove('hidden');
+    };
+    window.closeCVModal = function() {
+      const modal = document.getElementById('cv-modal');
+      if (modal) modal.classList.add('hidden');
+    };
+  </script>
 
   <script>
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbw9Sj9a45ojREEUICDwt9MsVJ-4NzqO3UgMXA1Vkw0RGjF30BK4SBSmE-oAZEoe-0dlKw/exec';
