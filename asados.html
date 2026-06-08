@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es" class="dark" style="background-color: #000; color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="Fotos/firma AK.jfif">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@400&display=swap" rel="stylesheet">
+  <title>Asados | Perspective</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  #sg-stage {
+    position: relative;
+    height: 900vh;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  #sg-sticky {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  #sg-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Canvas foto siguiente (fondo) */
+  #sg-canvas-next {
+    position: absolute;
+    display: block;
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    transform: scale(0.88);
+    opacity: 0;
+    z-index: 1;
+  }
+
+  /* Canvas foto actual (frente) */
+  #sg-canvas-curr {
+    position: absolute;
+    display: block;
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    transform: scale(1);
+    opacity: 1;
+    z-index: 2;
+  }
+
+  #sg-counter {
+    position: absolute;
+    bottom: 28px;
+    right: 32px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.35);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  #sg-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #sg-hint.gone { opacity: 0; }
+  #sg-hint span {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  #sg-chevron {
+    width: 18px;
+    height: 18px;
+    border-right: 1.5px solid rgba(255,255,255,0.3);
+    border-bottom: 1.5px solid rgba(255,255,255,0.3);
+    transform: rotate(45deg);
+    animation: sg-bounce 1.5s ease infinite;
+  }
+  @keyframes sg-bounce {
+    0%, 100% { transform: rotate(45deg) translateY(0);   opacity: 0.3; }
+    50%       { transform: rotate(45deg) translateY(5px); opacity: 0.9; }
+  }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+  /* Override global overflow-x (styles.css) */
+  html { overflow-x: clip; }
+  body { max-width: 100%; overflow-x: unset !important; }
+
+  /* Hamburger */
+  #mobile-menu-btn {
+    position: relative;
+    z-index: 9999 !important;
+    pointer-events: all !important;
+    cursor: pointer;
+  }
+
+  /* ── Imagen de fondo de página ── */
+  body {
+    background-image: url('Fotos/parrilla-background de asados.avif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-color: #000;   /* fallback mientras carga */
+  }
+
+  /* Overlay oscuro semi-transparente */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(0,0,0,0.82) 0%,
+      rgba(0,0,0,0.55) 38%,
+      rgba(0,0,0,0.28) 65%,
+      rgba(0,0,0,0.15) 100%
+    );
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Todo el contenido por encima del overlay */
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header ─ override de Tailwind bg-black/90 */
+  body > header {
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+  }
+
+  /* Mobile nav dropdown ─ semi-opaco */
+  #mobile-menu {
+    background: rgba(0, 0, 0, 0.85) !important;
+  }
+
+  /* Footer ─ override de Tailwind bg-black */
+  body > footer {
+    background: rgba(0, 0, 0, 0.80) !important;
+  }
+
+  /* Hero: texto blanco con sombra para legibilidad */
+  main h2,
+  main h3 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+  main p {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Secciones con fondo sólido opaco ─ semi-transparente */
+  main .bg-black,
+  main [class*="bg-black"] {
+    background: rgba(0, 0, 0, 0.65) !important;
+  }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Georgia', 'serif'],
+          },
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-black text-white flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- Header Component -->
+  <header class="sticky top-0 z-50 py-4 md:py-6 border-b border-white/10 bg-black/90 backdrop-blur-md transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-8 h-8 md:w-10 md:h-10 border-2 border-white flex items-center justify-center text-white font-bold text-lg md:text-xl">K</div>
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white font-serif hidden sm:block">Ambrossenkov</h1>
+      </a>
+      <nav class="hidden md:flex gap-8 items-center text-sm font-medium text-white/90">
+        <a href="index.html" data-es="Inicio" data-en="Home" class="hover:text-blue-400 transition-colors">Inicio</a>
+        <a href="curiosidades.html" data-es="Mi trayectoria" data-en="My Journey" class="hover:text-blue-400 transition-colors">Mi trayectoria</a>
+        <a href="inventos.html" data-es="Inventos" data-en="Inventions" class="hover:text-blue-400 transition-colors">Inventos</a>
+        <a href="pasatiempos.html" data-es="Hobbies" data-en="Hobbies" class="hover:text-blue-400 transition-colors">Hobbies</a>
+        <a href="quiensoy.html" data-es="Quién soy" data-en="Who I am" class="hover:text-blue-400 transition-colors">Quién soy</a>
+        <a href="asados.html" data-es="Actualmente" data-en="Currently" class="hover:text-blue-400 transition-colors">Actualmente</a>
+        <a href="#contacto" data-es="Contáctame" data-en="Contact me" class="hover:text-blue-400 transition-colors">Contáctame</a>
+      </nav>
+      <div class="flex items-center gap-4 md:gap-6">
+        <button class="lang-btn text-white hover:text-blue-400 transition-colors text-sm uppercase flex-shrink-0" data-lang="es" style="font-weight:700">ES</button>
+        <button class="lang-btn text-white hover:text-blue-400 transition-colors text-sm uppercase flex-shrink-0" data-lang="en" style="font-weight:400;opacity:0.35">EN</button>
+        <!-- Hamburger Menu Button -->
+        <button id="mobile-menu-btn" onclick="var m=document.getElementById('mobile-menu');m.classList.toggle('hidden');m.classList.toggle('flex');" class="md:hidden text-white hover:text-blue-400 transition-colors focus:outline-none ml-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile Navigation -->
+    <nav id="mobile-menu" class="hidden flex-col gap-4 px-4 pt-4 pb-6 bg-black border-b border-white/10 md:hidden w-full shadow-lg">
+      <a href="index.html" data-es="Inicio" data-en="Home" class="block text-base font-medium text-white/90 hover:text-blue-400">Inicio</a>
+      <a href="curiosidades.html" data-es="Mi trayectoria" data-en="My Journey" class="block text-base font-medium text-white/90 hover:text-blue-400">Mi trayectoria</a>
+      <a href="inventos.html" data-es="Inventos" data-en="Inventions" class="block text-base font-medium text-white/90 hover:text-blue-400">Inventos</a>
+      <a href="pasatiempos.html" data-es="Hobbies" data-en="Hobbies" class="block text-base font-medium text-white/90 hover:text-blue-400">Hobbies</a>
+      <a href="quiensoy.html" data-es="Quién soy" data-en="Who I am" class="block text-base font-medium text-white/90 hover:text-blue-400">Quién soy</a>
+      <a href="asados.html" data-es="Actualmente" data-en="Currently" class="block text-base font-medium text-white/90 hover:text-blue-400">Actualmente</a>
+      <a href="#contacto" data-es="Contáctame" data-en="Contact me" class="block text-base font-medium text-white/90 hover:text-blue-400">Contáctame</a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-0">
+
+    <!-- Hero Section -->
+    <div style="
+      margin-left: 7%;
+      margin-top: 0;
+      max-width: 620px;
+      margin-bottom: 4rem;
+    ">
+      <h2 data-i18n="asados-title" style="
+        font-family: 'Playfair Display', serif;
+        font-size: 88px;
+        font-weight: 700;
+        letter-spacing: -2px;
+        line-height: 0.95;
+        color: #F5F1E8;
+        text-shadow: 0px 3px 12px rgba(0,0,0,0.45);
+        margin: 0;
+      ">Asados</h2>
+
+      <p data-i18n="asados-subtitle" style="
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 28px;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: rgba(245,241,232,0.82);
+        margin-top: 12px;
+        margin-bottom: 28px;
+      ">El ritual argentino del fuego</p>
+
+      <p data-i18n="asados-desc" style="
+        font-family: 'Inter', sans-serif;
+        font-size: 23px;
+        font-weight: 400;
+        line-height: 1.7;
+        color: rgba(255,255,255,0.88);
+        max-width: 580px;
+        margin: 0;
+      ">El asado es mucho más que una forma de cocinar: es un ritual, una excusa para reunirse, y uno de mis mayores placeres.</p>
+    </div>
+
+    <!-- Galería scroll-driven -->
+    <div id="sg-stage">
+      <div id="sg-sticky">
+        <div id="sg-wrap">
+          <canvas id="sg-canvas-next" width="1280" height="853"></canvas>
+          <canvas id="sg-canvas-curr" width="1280" height="853"></canvas>
+        </div>
+        <div id="sg-counter">1 / 13</div>
+        <div id="sg-hint">
+          <span>Scroll</span>
+          <div id="sg-chevron"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= STANDARD FOOTER ================= -->
+  <footer class="relative w-full border-t border-white/10 bg-black mt-auto overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col items-center gap-10 relative z-10">
+      <div class="w-full text-center md:text-left">
+        <h3 data-i18n="ft-contact-title" class="text-2xl font-bold text-white tracking-widest uppercase">Contactame</h3>
+      </div>
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full text-white">
+        <a href="mailto:k.ambrossenkov@gmail.com" class="flex items-center gap-3 hover:text-blue-400 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span class="font-medium text-lg">k.ambrossenkov@gmail.com</span>
+        </a>
+        <a href="https://www.instagram.com/konsta_ambrossenkov/?__d=1" target="_blank" class="flex items-center gap-3 hover:text-blue-400 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/konstantino-ambrossenkov/" target="_blank" class="flex items-center gap-3 hover:text-blue-400 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+      </div>
+      <div class="mt-4">
+        <img src="Fotos/firma AK.jfif" alt="Firma AK" class="h-16 object-contain" onerror="this.outerHTML='<span class=\'text-2xl font-serif italic text-white opacity-70\'>Firma AK</span>'" />
+      </div>
+      <div class="pt-8 w-full border-t border-white/10 text-center text-gray-500">
+        <p data-i18n="ft-help" class="font-medium text-lg tracking-widest">Estoy para ayudar</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js" onerror="console.info('Scripts running')"></script>
+  <script>
+  window.__idiomaPatch = function (lang) {
+    document.querySelectorAll('[data-es]').forEach(function (el) {
+      var val = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es');
+      if (val !== null) el.textContent = val;
+    });
+  };
+  </script>
+  <script src="idioma.js"></script>
+
+  <script>
+(function() {
+  'use strict';
+
+  const PHOTOS = [
+    'Fotos/asado_portada.jpg',
+    'Fotos/asado1.jpg',
+    'Fotos/asado2.jpg',
+    'Fotos/asado3.jpg',
+    'Fotos/asado4.jpg',
+    'Fotos/asado5.jpg',
+    'Fotos/asado6.jpg',
+    'Fotos/asado7.jpg',
+    'Fotos/asado8.jpg',
+    'Fotos/asado9.jpg',
+    'Fotos/asado10.jpg',
+    'Fotos/asado11.jpg',
+    'Fotos/asado12.jpg',
+  ];
+
+  const TOTAL = PHOTOS.length;
+
+  const stage      = document.getElementById('sg-stage');
+  const canvasCurr = document.getElementById('sg-canvas-curr');
+  const canvasNext = document.getElementById('sg-canvas-next');
+  const ctxCurr    = canvasCurr.getContext('2d');
+  const ctxNext    = canvasNext.getContext('2d');
+  const counter    = document.getElementById('sg-counter');
+  const hint       = document.getElementById('sg-hint');
+
+  const images = new Array(TOTAL);
+  let loaded   = 0;
+  let allReady = false;
+  let rafPending    = false;
+  let lastIndex     = -1;
+  let lastNextIndex = -1;
+
+  /* ── Helpers ── */
+  function setCanvasSize(canvas, img) {
+    const aspect = img.naturalWidth / img.naturalHeight;
+    const maxW   = Math.min(window.innerWidth * 0.88, 1400);
+    const maxH   = window.innerHeight * 0.88;
+    let w, h;
+    if (maxW / aspect <= maxH) { w = maxW; h = maxW / aspect; }
+    else                        { h = maxH; w = maxH * aspect; }
+    canvas.width        = img.naturalWidth;
+    canvas.height       = img.naturalHeight;
+    canvas.style.width  = Math.round(w) + 'px';
+    canvas.style.height = Math.round(h) + 'px';
+  }
+
+  function drawTo(canvas, ctx, index) {
+    const img = images[index];
+    if (!img || !img.complete || !img.naturalWidth) return;
+    setCanvasSize(canvas, img);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+
+  /* ── Preload ── */
+  function onImageSettled() {
+    loaded++;
+    if (loaded === TOTAL) {
+      allReady = true;
+      init();
+      /* Si el usuario ya scrolleó antes de que cargaran las imágenes,
+         forzar el cálculo de progreso actual */
+      requestAnimationFrame(() => window.dispatchEvent(new Event('scroll')));
+    }
+  }
+
+  PHOTOS.forEach((src, i) => {
+    const img = new Image();
+    img.onload  = onImageSettled;
+    img.onerror = onImageSettled;  /* fix: también contar errores como "listos" */
+    img.src = src;
+    images[i] = img;
+  });
+
+  function init() {
+    drawTo(canvasCurr, ctxCurr, 0);
+    lastIndex = 0;
+    if (TOTAL > 1) { drawTo(canvasNext, ctxNext, 1); lastNextIndex = 1; }
+    counter.textContent = `1 / ${TOTAL}`;
+  }
+
+  /* ── Scroll → crossfade ── */
+  function onScroll() {
+    if (!allReady) return;
+    if (rafPending) return;
+    rafPending = true;
+
+    requestAnimationFrame(() => {
+      rafPending = false;
+
+      const stageTop    = stage.getBoundingClientRect().top + window.scrollY;
+      const stageHeight = stage.offsetHeight - window.innerHeight;
+      const scrolled    = Math.max(0, window.scrollY - stageTop);
+      const progress    = Math.min(1, scrolled / stageHeight);
+
+      const fullProgress = progress * (TOTAL - 1);
+      const index        = Math.min(TOTAL - 1, Math.floor(fullProgress));
+      const nextIndex    = Math.min(TOTAL - 1, index + 1);
+      const t            = fullProgress - index;
+
+      /* Transición empieza al 50% del segmento */
+      const T_START = 0.5;
+      let cf = t > T_START ? (t - T_START) / (1 - T_START) : 0;
+      /* easeInOut suave */
+      cf = cf * cf * (3 - 2 * cf);
+
+      if (index !== lastIndex) {
+        drawTo(canvasCurr, ctxCurr, index);
+        lastIndex = index;
+      }
+      if (nextIndex !== lastNextIndex) {
+        drawTo(canvasNext, ctxNext, nextIndex);
+        lastNextIndex = nextIndex;
+      }
+
+      const currScale = 1 - cf * 0.08;
+      const nextScale = 0.88 + cf * 0.12;
+
+      canvasCurr.style.transform = `scale(${currScale})`;
+      canvasCurr.style.opacity   = String(1 - cf);
+
+      canvasNext.style.transform = `scale(${nextScale})`;
+      canvasNext.style.opacity   = String(cf);
+
+      counter.textContent = `${index + 1} / ${TOTAL}`;
+
+      if (window.scrollY > 60) hint.classList.add('gone');
+      else                      hint.classList.remove('gone');
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => {
+    if (!allReady) return;
+    if (lastIndex >= 0)     drawTo(canvasCurr, ctxCurr, lastIndex);
+    if (lastNextIndex >= 0) drawTo(canvasNext, ctxNext, lastNextIndex);
+  });
+
+})();
+  </script>
+
+  <!-- Fallback carrusel: IntersectionObserver -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var carrusel = document.querySelector('[class*="carrusel"], [class*="gallery"], [class*="slider"], [id*="carrusel"], #sg-stage');
+    if (carrusel) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(carrusel);
+    }
+    /* Disparar scroll una vez para inicializar estado si imágenes ya cargaron */
+    window.dispatchEvent(new Event('scroll'));
+  });
+  </script>
+
+  <!-- Vercel Analytics -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
