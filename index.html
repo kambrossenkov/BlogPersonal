@@ -433,11 +433,12 @@
       </div>
       <div class="popup-footer">
         <button class="popup-btn" id="popupSubmit" onclick="handlePopupSubmit()">
-          <span data-es="Entrar" data-en="Enter">Entrar</span>
+          <span data-es="Entrar" data-en="Sign Up">Entrar</span>
         </button>
       </div>
     </div>
   </div>
+
 
   <!-- Navbar — Barra de navegación fija -->
   <nav>
@@ -530,30 +531,7 @@
       }
     </style>
 
-    <!-- Popup de pregunta — se muestra si el usuario no respondió aún -->
-    <div class="popup-overlay" id="popupTrayectoriaPage">
-      <div class="popup-card">
-        <div class="popup-header">
-          <h3 class="popup-title" data-es="Una última pregunta" data-en="One quick thing">Una última pregunta</h3>
-          <p class="popup-desc" data-es="¿Cuál fue el hito que más te marcó en tu vida?" data-en="What was the milestone that marked you most?">¿Cuál fue el hito que más te marcó en tu vida?</p>
-        </div>
-        <div class="popup-content">
-          <label class="popup-label">
-            <input id="inputTrayectoriaPage" class="popup-input" type="text" placeholder="Tu respuesta..." maxlength="100" />
-            <span class="popup-error" id="errorTrayectoriaPage"></span>
-          </label>
-        </div>
-        <div class="popup-footer">
-          <button class="popup-btn"
-                  onclick="submitPopupPage('popupTrayectoriaPage','inputTrayectoriaPage','errorTrayectoriaPage','trayectoria','popupTrayectoriaOk')">
-            <span data-es="Continuar" data-en="Continue">Continuar</span>
-          </button>
-          <button class="popup-btn-skip" onclick="saltarPopupPage('popupTrayectoriaPage')">
-            <span data-es="Saltar" data-en="Skip">Saltar</span>
-          </button>
-        </div>
-      </div>
-    </div>
+
 
 
     <!-- Timeline -->
@@ -1345,28 +1323,7 @@
   .popup-btn-skip:hover { color:rgba(255,255,255,0.65); border-color:rgba(255,255,255,0.18); }
 </style>
 
-<div class="popup-overlay" id="popupHobbiesPage">
-  <div class="popup-card">
-    <div class="popup-header">
-      <h3 class="popup-title" data-es="Una última pregunta" data-en="One quick thing">Una última pregunta</h3>
-      <p class="popup-desc" data-es="¿Cuál es tu hobby preferido?" data-en="What's your favorite hobby?">¿Cuál es tu hobby preferido?</p>
-    </div>
-    <div class="popup-content">
-      <label class="popup-label">
-        <input id="inputHobbiesPage" class="popup-input" type="text" placeholder="Tu respuesta..." maxlength="100" />
-        <span class="popup-error" id="errorHobbiesPage"></span>
-      </label>
-    </div>
-    <div class="popup-footer">
-      <button class="popup-btn" onclick="submitPopupPage('popupHobbiesPage','inputHobbiesPage','errorHobbiesPage','hobbies','popupHobbiesOk')">
-        <span data-es="Continuar" data-en="Continue">Continuar</span>
-      </button>
-      <button class="popup-btn-skip" onclick="saltarPopupPage('popupHobbiesPage')">
-        <span data-es="Saltar" data-en="Skip">Saltar</span>
-      </button>
-    </div>
-  </div>
-</div>
+
 
 <main class="relative w-full h-screen overflow-hidden bg-black flex flex-col items-center justify-center">
   <canvas id="noise-canvas" class="absolute inset-0 z-0 pointer-events-none opacity-50"></canvas>
@@ -1752,28 +1709,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .popup-btn-skip-inv:hover { color:rgba(255,255,255,0.65); border-color:rgba(255,255,255,0.18); }
     </style>
 
-    <div class="popup-overlay-inv" id="popupInventosPage">
-      <div class="popup-card-inv">
-        <div class="popup-header-inv">
-          <h3 class="popup-title-inv" data-es="Una última pregunta" data-en="One quick thing">Una última pregunta</h3>
-          <p class="popup-desc-inv" data-es="¿Qué es lo más curioso que inventarías?" data-en="What's the most curious thing you'd invent?">¿Qué es lo más curioso que inventarías?</p>
-        </div>
-        <div class="popup-content">
-          <label class="popup-label-inv">
-            <input id="inputInventosPage" class="popup-input-inv" type="text" placeholder="Tu respuesta..." maxlength="100" />
-            <span class="popup-error-inv" id="errorInventosPage"></span>
-          </label>
-        </div>
-        <div class="popup-footer">
-          <button class="popup-btn-inv" onclick="submitPopupPage('popupInventosPage','inputInventosPage','errorInventosPage','inventos','popupInventosOk')">
-            <span data-es="Continuar" data-en="Continue">Continuar</span>
-          </button>
-          <button class="popup-btn-skip-inv" onclick="saltarPopupPage('popupInventosPage')">
-            <span data-es="Saltar" data-en="Skip">Saltar</span>
-          </button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Neon Grid Background -->
     <canvas id="neonGrid" class="absolute inset-0 w-full h-full pointer-events-none bg-black" style="z-index: 0;"></canvas>
@@ -2143,29 +2079,7 @@ document.addEventListener('DOMContentLoaded', () => {
       @keyframes meteorFallPerf { 0% { transform: translateY(-200px) translateX(200px) rotate(45deg); opacity: 1; } 100% { transform: translateY(100vh) translateX(-100vh) rotate(45deg); opacity: 0; } }
     </style>
 
-    <div class="popup-overlay-perf" id="popupPerfilOverlay">
-      <div class="popup-card-perf">
-        <div class="popup-header-perf">
-          <h3 class="popup-title-perf">One quick thing</h3>
-          <p class="popup-desc-perf">Leave your name and email to continue</p>
-        </div>
-        <div class="popup-content">
-          <label class="popup-label-perf">
-            Name
-            <input id="perfilNombre" class="popup-input-perf" type="text" placeholder="Your name..." maxlength="20" />
-            <span class="popup-error-perf" id="perfilErrorNombre"></span>
-          </label>
-          <label class="popup-label-perf" style="margin-top:12px">
-            Email
-            <input id="perfilEmail" class="popup-input-perf" type="email" placeholder="your@email.com" />
-            <span class="popup-error-perf" id="perfilErrorEmail"></span>
-          </label>
-        </div>
-        <div class="popup-footer">
-          <button class="popup-btn-perf" onclick="submitPerfilPopup()">Continue</button>
-        </div>
-      </div>
-    </div>
+
     
     <div id="global-bg-perf">
       <div class="absolute inset-[-50px] w-[calc(100%+100px)] h-[calc(100%+100px)] bg-[linear-gradient(rgba(0,212,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.07)_1px,transparent_1px)] bg-[length:50px_50px]" style="animation: gridMovePerf 3s linear infinite;"></div>
