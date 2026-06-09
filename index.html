@@ -2840,26 +2840,62 @@ document.addEventListener('DOMContentLoaded', () => {
       var error = document.getElementById('popupError');
       var lang  = localStorage.getItem('idioma') || 'es';
       var value = input.value.trim();
-      var soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/.test(value);
+
+      function mostrarError(msg) {
+        error.textContent = msg;
+        input.classList.add('error');
+      }
 
       if (!value) {
-        error.textContent = lang === 'es' ? 'Por favor ingresá tu nombre.' : 'Please enter your name.';
-        input.classList.add('error');
+        mostrarError(lang === 'es' ? 'Por favor ingresá tu nombre.' : 'Please enter your name.');
         return;
       }
-      if (!soloLetras) {
-        error.textContent = lang === 'es' ? 'Solo letras, sin números ni símbolos.' : 'Letters only, no numbers or symbols.';
-        input.classList.add('error');
+
+      // Regla 1 — sin espacios
+      if (value.includes(' ')) {
+        mostrarError(lang === 'es' ? 'El nombre no puede contener espacios.' : 'Name cannot contain spaces.');
         return;
       }
+
+      // Regla 3 — solo letras (unicode)
+      if (!/^[\p{L}]+$/u.test(value)) {
+        mostrarError(lang === 'es' ? 'El nombre solo puede contener letras, sin números ni símbolos.' : 'Letters only, no numbers or symbols.');
+        return;
+      }
+
+      // Regla 4 — longitud
       if (value.length < 2) {
-        error.textContent = lang === 'es' ? 'El nombre debe tener al menos 2 caracteres.' : 'Name must be at least 2 characters.';
-        input.classList.add('error');
+        mostrarError(lang === 'es' ? 'El nombre es demasiado corto.' : 'Name is too short.');
         return;
       }
-      if (value.length > 20) {
-        error.textContent = lang === 'es' ? 'El nombre no puede tener más de 20 caracteres.' : 'Name cannot exceed 20 characters.';
-        input.classList.add('error');
+      if (value.length > 30) {
+        mostrarError(lang === 'es' ? 'El nombre es demasiado largo.' : 'Name is too long.');
+        return;
+      }
+
+      // Regla 5 — no todo el mismo carácter
+      if (/^(.)\1+$/u.test(value)) {
+        mostrarError(lang === 'es' ? 'Por favor ingresá tu nombre real.' : 'Please enter your real name.');
+        return;
+      }
+
+      // Regla 2 — palabras prohibidas
+      const palabrasProhibidas = [
+        'correr','saltar','comer','beber','dormir','hablar','escribir','leer',
+        'jugar','trabajar','estudiar','vivir','morir','nacer','crecer','volar',
+        'caminar','cortar','abrir','cerrar','entrar','salir','mirar','escuchar',
+        'pensar','sentir','querer','poder','tener','hacer','decir','dar','ver',
+        'saber','venir','ir','estar','ser','haber','poner','traer','llegar',
+        'run','jump','eat','drink','sleep','talk','write','read','play','work',
+        'study','live','die','grow','fly','walk','cut','open','close','enter',
+        'exit','look','listen','think','feel','want','can','have','make','say',
+        'give','see','know','come','go','be','put','bring','arrive',
+        'test','prueba','hola','hello','admin','user','usuario','nombre',
+        'nadie','alguien','ninguno','todos','nada','algo','aaaa','asdf',
+        'qwerty','zxcv','abc','xyz','null','undefined'
+      ];
+      if (palabrasProhibidas.includes(value.toLowerCase())) {
+        mostrarError(lang === 'es' ? 'Por favor ingresá tu nombre real.' : 'Please enter your real name.');
         return;
       }
 
