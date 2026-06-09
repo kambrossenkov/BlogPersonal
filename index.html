@@ -841,12 +841,13 @@ window.VADER_PARTS = VADER_PARTS;
         <p style="font-family:'Inter',sans-serif; font-size:clamp(15px,1.4vw,18px); line-height:1.9; color:#C2C2C2; font-weight:400;" data-es="Soy Konstantino, este sitio web tiene la finalidad de mostrar más quién soy yo. Si te llega a gustar el diseño de la página, al final del todo hay una cajita para votar." data-en="I'm Konstantino, this website's purpose is to show more about who I am. If you like the design, at the end there's a little box to vote.">
           Soy Konstantino, este sitio web tiene la finalidad de mostrar más quién soy yo. Si te llega a gustar el diseño de la página, al final del todo hay una cajita para votar.
         </p>
-        <p style="font-family:'Inter',sans-serif; font-size:clamp(13px,1.2vw,16px); line-height:1.8; color:rgba(255,255,255,0.45); font-style:italic;" data-es="Para arrancar te digo que me gusta Star Wars, por lo cual... ¡disfrutá el muñequito! 👇" data-en="To start, I'll tell you I love Star Wars, so... enjoy the little figure! 👇">
-          Para arrancar te digo que me gusta Star Wars, por lo cual... ¡disfrutá el muñequito! 👇
+        <p style="font-family:'Inter',sans-serif; font-size:clamp(13px,1.2vw,16px); line-height:1.8; color:rgba(255,255,255,0.45); font-style:italic;" data-es="Para arrancar te digo que me gusta Star Wars, podés mover el Vader y si hacés doble click escuchá" data-en="To start, I love Star Wars — you can move Vader and if you double click, listen">
+          Para arrancar te digo que me gusta Star Wars, podés mover el Vader y si hacés doble click escuchá
         </p>
       </div>
       <!-- 3. Dark Vader -->
       <div id="vaderContainer-inicio" style="width:100%; max-width:900px; height:650px; flex-shrink:0; border-radius:16px; overflow:hidden; cursor:grab; z-index:5;"></div>
+      <p style="font-family:'Inter',sans-serif; font-size:12px; color:rgba(255,255,255,0.25); text-align:center; margin-top:8px; letter-spacing:0.5px;" data-es="doble click para activar" data-en="double click to activate">doble click para activar</p>
     </div>
   </section>
 
@@ -3313,6 +3314,44 @@ document.addEventListener('DOMContentLoaded', () => {
       sidebar.style.transform = 'translateX(-100%)';
       overlay.style.display = 'none';
     }
+  </script>
+
+  <script>
+    const vaderSonidos = [
+      'Sonidos/I am your father.mp4',
+      'Sonidos/Marcha Imperial.mp4',
+      'Sonidos/Bar Star Wars.mp4'
+    ];
+    let vaderSonidoIndex = 0;
+    let vaderAudio = null;
+
+    function reproducirSonidoVader() {
+      if (vaderAudio) {
+        vaderAudio.pause();
+        vaderAudio.currentTime = 0;
+      }
+      vaderAudio = new Audio(vaderSonidos[vaderSonidoIndex]);
+      vaderAudio.volume = 0.8;
+      vaderAudio.play();
+      vaderSonidoIndex = (vaderSonidoIndex + 1) % vaderSonidos.length;
+    }
+
+    const vaderContainer = document.getElementById('vaderContainer-inicio');
+
+    vaderContainer.addEventListener('dblclick', function() {
+      reproducirSonidoVader();
+    });
+
+    let lastTap = 0;
+    vaderContainer.addEventListener('touchend', function(e) {
+      const ahora = Date.now();
+      const diferencia = ahora - lastTap;
+      if (diferencia < 300 && diferencia > 0) {
+        reproducirSonidoVader();
+        e.preventDefault();
+      }
+      lastTap = ahora;
+    });
   </script>
 
 </body>
