@@ -2772,6 +2772,53 @@ document.addEventListener('DOMContentLoaded', () => {
   <script>
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbw9Sj9a45ojREEUICDwt9MsVJ-4NzqO3UgMXA1Vkw0RGjF30BK4SBSmE-oAZEoe-0dlKw/exec';
 
+    // ---- SHEETS INTEGRATION ----
+    var SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyw4HuymJwcvAbBf9968n6kpp18uyMz548Q9Ligq84X1QhhqHvliRvtEpM8C6ymuRWr/exec';
+    let usuarioNombre = '';
+    let sesionId = Date.now().toString();
+
+    function guardarNombreEnSheet(nombre) {
+      const ahora = new Date();
+      const fecha = ahora.toLocaleDateString('es-AR');
+      const hora  = ahora.toLocaleTimeString('es-AR');
+      fetch(SHEETS_ENDPOINT, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, fecha, hora, meGusta: '', indiferente: '', noMeGusta: '' })
+      }).catch(function() {});
+    }
+
+    function guardarVotoEnSheet(tipo) {
+      const ahora = new Date();
+      const fecha = ahora.toLocaleDateString('es-AR');
+      const hora  = ahora.toLocaleTimeString('es-AR');
+      fetch(SHEETS_ENDPOINT, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: usuarioNombre || localStorage.getItem('userName') || 'Anónimo',
+          fecha, hora,
+          meGusta:    tipo === 'like'    ? '✓' : '',
+          indiferente: tipo === 'neutral' ? '✓' : '',
+          noMeGusta:  tipo === 'dislike' ? '✓' : ''
+        })
+      }).catch(function() {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('[id="vote-like"]').forEach(function(el) {
+        el.addEventListener('change', function() {
+          if (this.checked) guardarVotoEnSheet('like');
+        });
+      });
+      document.querySelectorAll('.vote-btn-neutral').forEach(function(btn) {
+        btn.addEventListener('click', function() { guardarVotoEnSheet('neutral'); });
+      });
+      document.querySelectorAll('.vote-btn-dislike').forEach(function(btn) {
+        btn.addEventListener('click', function() { guardarVotoEnSheet('dislike'); });
+      });
+    });
+
     // ---- POPUP DE BIENVENIDA ----
     (function() {
       var savedName = localStorage.getItem('userName');
@@ -2827,6 +2874,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }).catch(function() {});
 
       localStorage.setItem('userName', value);
+      usuarioNombre = value;
+      guardarNombreEnSheet(value);
       actualizarNombreTitulo();
 
       var overlay = document.getElementById('popupOverlay');
