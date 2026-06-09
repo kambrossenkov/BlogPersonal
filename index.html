@@ -637,7 +637,7 @@ window.VADER_PARTS = VADER_PARTS;
     </div>
     <div style="position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; gap:32px;">
       <!-- PRIMERO: Vader -->
-      <div id="vaderContainer-inicio" style="width:320px; height:400px; flex-shrink:0; border-radius:16px; overflow:hidden; cursor:grab; z-index:5;"></div>
+      <div id="vaderContainer-inicio" style="width:100%; max-width:900px; height:650px; flex-shrink:0; border-radius:16px; overflow:hidden; cursor:grab; z-index:5;"></div>
       <!-- SEGUNDO: texto de bienvenida -->
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; z-index:2;" class="bienvenida-titulo">
         <span data-es="Bienvenido" data-en="Welcome">Bienvenido</span>
@@ -2553,8 +2553,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const rendererTray = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   const section = document.getElementById('trayectoria');
   rendererTray.setSize(section.offsetWidth, section.offsetHeight);
-  rendererTray.setPixelRatio(window.devicePixelRatio);
+  rendererTray.setPixelRatio(1);
   containerTray.appendChild(rendererTray.domElement);
+  rendererTray.domElement.style.willChange = 'transform';
   const vertexShader = `void main() { gl_Position = vec4(position, 1.0); }`;
   const fragmentShader = `
     uniform float iTime;
@@ -2592,7 +2593,7 @@ document.addEventListener('DOMContentLoaded', () => {
   sceneTray.add(meshTray);
   (function animate() {
     requestAnimationFrame(animate);
-    uniformsTray.iTime.value += 0.016;
+    uniformsTray.iTime.value += 0.008;
     rendererTray.render(sceneTray, cameraTray);
   })();
   window.addEventListener('resize', () => {
@@ -2617,19 +2618,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const gsap  = window.gsap;
       const parts = window.VADER_PARTS;
 
-      const W = 280;
-      const H = 320;
+      const W = container.clientWidth || 900;
+      const H = container.clientHeight || 650;
 
       const scene = new THREE.Scene();
       scene.background = null;
 
       const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 1000);
-      camera.position.set(0, 2, -22);
+      camera.position.set(0, 2, 22);
       camera.lookAt(0, 0, 0);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
       renderer.setSize(W, H);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(1);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 0.95;
       renderer.shadowMap.enabled = true;
@@ -2666,17 +2667,71 @@ document.addEventListener('DOMContentLoaded', () => {
       rimRight.position.set(16, 8, -2);
       scene.add(rimRight);
 
-      const platformGlow = new THREE.PointLight(0xffffff, 3.0, 18);
-      platformGlow.position.set(0, -3.5, 1.5);
-      scene.add(platformGlow);
 
-      const platform = new THREE.Mesh(
-        new THREE.CylinderGeometry(3, 3, 0.12, 64),
-        new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.0 })
+      // Imperial Platform
+      // 1. Disco rojo base
+      const discoRojo = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.75, 2.75, 0.14, 64),
+        new THREE.MeshStandardMaterial({color:0xC62828, roughness:0.6, metalness:0.1})
       );
-      platform.position.y = -4.2;
-      platform.receiveShadow = true;
-      scene.add(platform);
+      discoRojo.position.y = -4.2;
+      scene.add(discoRojo);
+
+      // 2. Anillo negro exterior sobre el rojo
+      const anilloNegro = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.75, 2.75, 0.16, 64, 1, true),
+        new THREE.MeshStandardMaterial({color:0x0D0D0F, roughness:0.3, metalness:0.7, side:THREE.BackSide})
+      );
+      anilloNegro.position.y = -4.19;
+      scene.add(anilloNegro);
+
+      // 3. Centro negro del símbolo
+      const centro = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.52, 0.52, 0.16, 32),
+        new THREE.MeshStandardMaterial({color:0x0D0D0F, roughness:0.3, metalness:0.5})
+      );
+      centro.position.y = -4.12;
+      scene.add(centro);
+
+      // 4. 8 brazos del símbolo imperial
+      const matSimboloNegro = new THREE.MeshStandardMaterial({color:0x0D0D0F, roughness:0.3, metalness:0.5});
+      for(let i = 0; i < 8; i++){
+        const a = (i/8)*Math.PI*2;
+        const brazo = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.16, 1.6), matSimboloNegro);
+        brazo.position.set(Math.cos(a)*1.35, -4.12, Math.sin(a)*1.35);
+        brazo.rotation.y = -a;
+        scene.add(brazo);
+        const punta = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 0.38), matSimboloNegro);
+        punta.position.set(Math.cos(a)*2.15, -4.12, Math.sin(a)*2.15);
+        punta.rotation.y = -a;
+        scene.add(punta);
+      }
+
+      // 5. Borde exterior gris metalico
+      const borde = new THREE.Mesh(
+        new THREE.CylinderGeometry(3.05, 3.05, 0.26, 64),
+        new THREE.MeshStandardMaterial({color:0x1a1a1a, roughness:0.2, metalness:0.9})
+      );
+      borde.position.y = -4.28;
+      scene.add(borde);
+
+      // 6. Aro de energia violeta
+      const aro = new THREE.Mesh(
+        new THREE.TorusGeometry(2.88, 0.07, 12, 80),
+        new THREE.MeshStandardMaterial({color:0xB04CFF, emissive:0xB04CFF, emissiveIntensity:2.5, transparent:true, opacity:0.9})
+      );
+      aro.rotation.x = Math.PI/2;
+      aro.position.y = -4.44;
+      scene.add(aro);
+
+      // 7. Luces
+      const luzVioleta = new THREE.PointLight(0xB04CFF, 2.0, 6);
+      luzVioleta.position.set(0, -4.6, 0);
+      scene.add(luzVioleta);
+
+      const luzRoja = new THREE.PointLight(0xC62828, 1.2, 8);
+      luzRoja.position.set(0, -3.8, 0);
+      scene.add(luzRoja);
 
       const figure = new THREE.Group();
       scene.add(figure);
@@ -2685,7 +2740,7 @@ document.addEventListener('DOMContentLoaded', () => {
       headGroup.position.y = 2.8;
       figure.add(headGroup);
 
-      figure.scale.set(0.85, 0.85, 0.85);
+      
 
       const matSuit = new THREE.MeshStandardMaterial({
         color: new THREE.Color('#14181D'),
@@ -2755,7 +2810,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (gsap) {
         gsap.to(figure.scale, {
-          x: 0.85 * 1.012, y: 0.85 * 1.008, z: 0.85 * 1.012,
+          x: 1.012, y: 1.008, z: 1.012,
           duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut'
         });
 
@@ -2805,6 +2860,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
