@@ -141,7 +141,7 @@ window.VADER_PARTS = VADER_PARTS;
   <style>
     /* Variables CSS del tema oscuro (usadas por clases Tailwind custom) */
     :root {
-      --background: #050a18;
+      --background: #02081A;
       --card: rgba(15, 20, 40, 0.5);
       --text: #ffffff;
       --muted: rgba(255,255,255,0.5);
@@ -162,7 +162,7 @@ window.VADER_PARTS = VADER_PARTS;
     }
 
     html {
-      background: #050a18;
+      background: #02081A;
     }
 
     body {
@@ -193,7 +193,7 @@ window.VADER_PARTS = VADER_PARTS;
 
     .fs-1 {
       width: 130px; height: 130px;
-      background: radial-gradient(circle at 30% 30%, #1e3a6e, #050a18);
+      background: radial-gradient(circle at 30% 30%, #1e3a6e, #02081A);
       top: 12%; left: 7%;
       border-radius: 30%;
       animation-delay: 0s;
@@ -209,7 +209,7 @@ window.VADER_PARTS = VADER_PARTS;
 
     .fs-3 {
       width: 70px; height: 70px;
-      background: radial-gradient(circle at 35% 35%, #0f2d5c, #050a18);
+      background: radial-gradient(circle at 35% 35%, #0f2d5c, #02081A);
       top: 45%; left: 4%;
       border-radius: 20%;
       animation-delay: -4s;
@@ -233,7 +233,7 @@ window.VADER_PARTS = VADER_PARTS;
 
     .fs-6 {
       width: 85px; height: 45px;
-      background: radial-gradient(ellipse at 30% 30%, #112850, #050a18);
+      background: radial-gradient(ellipse at 30% 30%, #112850, #02081A);
       top: 38%; right: 17%;
       border-radius: 30%;
       animation-delay: -5s;
@@ -249,7 +249,7 @@ window.VADER_PARTS = VADER_PARTS;
 
     .fs-8 {
       width: 80px; height: 80px;
-      background: radial-gradient(circle at 30% 40%, #0e2450, #050a18);
+      background: radial-gradient(circle at 30% 40%, #0e2450, #02081A);
       top: 62%; left: 19%;
       border-radius: 50% 20%;
       animation-delay: -2.5s;
@@ -258,51 +258,6 @@ window.VADER_PARTS = VADER_PARTS;
     @keyframes floatShape {
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50%       { transform: translateY(-20px) rotate(5deg); }
-    }
-
-    /* ---- TOGGLE DE IDIOMA ---- */
-
-    .header-inicio {
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 1000;
-      padding: 16px 24px;
-      pointer-events: none;
-    }
-
-    .idioma-burbuja {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 100px;
-      padding: 4px 6px;
-      pointer-events: all;
-    }
-
-    .idioma-btn {
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      padding: 5px 12px;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .idioma-btn.active {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-    }
-
-    .idioma-btn:hover:not(.active) {
-      color: rgba(255, 255, 255, 0.8);
     }
 
     /* ---- POPUP DE BIENVENIDA ---- */
@@ -448,7 +403,7 @@ window.VADER_PARTS = VADER_PARTS;
     #inicio {
       position: relative;
       overflow: hidden;
-      background-color: #050a18;
+      background-color: #02081A;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -576,17 +531,55 @@ window.VADER_PARTS = VADER_PARTS;
       left: 0;
       box-shadow: 0 0 12px 3px rgba(0, 212, 255, 0.7);
     }
+    @keyframes breathe {
+      0%, 100% { opacity: 0.88; }
+      50% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Toggle de idioma ES/EN (fixed, esquina superior derecha) -->
-  <header class="header-inicio">
-    <div class="idioma-burbuja">
-      <button class="idioma-btn active" id="btn-es" onclick="setIdioma('es')">ES</button>
-      <button class="idioma-btn" id="btn-en" onclick="setIdioma('en')">EN</button>
+  <!-- Botón trigger sidebar -->
+  <div id="nav-trigger" style="position:fixed; top:16px; left:16px; z-index:9999; width:40px; height:40px; border:2px solid white; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:18px; font-family:serif; cursor:pointer; background:rgba(5,10,24,0.8); backdrop-filter:blur(8px);">K</div>
+
+  <!-- Overlay oscuro -->
+  <div id="nav-overlay" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);"></div>
+
+  <!-- Sidebar de navegación -->
+  <aside id="nav-sidebar" style="position:fixed; top:0; left:0; z-index:9999; width:260px; height:100vh; background:rgba(10,15,30,0.97); border-right:1px solid rgba(255,255,255,0.08); transform:translateX(-100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; padding:24px 16px; gap:8px;">
+
+    <div style="display:flex; align-items:center; gap:12px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:8px;">
+      <div style="width:36px; height:36px; border:2px solid white; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-family:serif;">K</div>
+      <span style="color:white; font-weight:600; font-size:16px; font-family:serif;">Ambrossenkov</span>
     </div>
-  </header>
+
+    <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:8px; margin-bottom:8px;">
+      <span style="color:rgba(255,255,255,0.5); font-size:12px; font-weight:500; letter-spacing:1px; text-transform:uppercase;">Idioma</span>
+      <div style="margin-left:auto; display:flex; gap:4px;">
+        <button id="sidebar-btn-es" onclick="setIdioma('es')" style="padding:4px 10px; border-radius:20px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.15); color:white; font-size:12px; font-weight:600; cursor:pointer;">ES</button>
+        <button id="sidebar-btn-en" onclick="setIdioma('en')" style="padding:4px 10px; border-radius:20px; border:1px solid rgba(255,255,255,0.08); background:transparent; color:rgba(255,255,255,0.4); font-size:12px; font-weight:600; cursor:pointer;">EN</button>
+      </div>
+    </div>
+
+    <nav style="display:flex; flex-direction:column; gap:4px;">
+      <a onclick="navTo('inicio')" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; color:rgba(255,255,255,0.75); font-size:15px; font-weight:500; cursor:pointer; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+        <span>🏠</span> <span data-es="Inicio" data-en="Home">Inicio</span>
+      </a>
+      <a onclick="navTo('trayectoria')" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; color:rgba(255,255,255,0.75); font-size:15px; font-weight:500; cursor:pointer; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+        <span>📖</span> <span data-es="Mi trayectoria" data-en="My Journey">Mi trayectoria</span>
+      </a>
+      <a onclick="navTo('pasatiempos')" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; color:rgba(255,255,255,0.75); font-size:15px; font-weight:500; cursor:pointer; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+        <span>🎯</span> <span data-es="Mis pasatiempos" data-en="Hobbies">Mis pasatiempos</span>
+      </a>
+      <a onclick="navTo('inventos')" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; color:rgba(255,255,255,0.75); font-size:15px; font-weight:500; cursor:pointer; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+        <span>💡</span> <span data-es="Inventos" data-en="Inventions">Inventos</span>
+      </a>
+      <a onclick="navTo('miperfil')" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; color:rgba(255,255,255,0.75); font-size:15px; font-weight:500; cursor:pointer; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+        <span>👤</span> <span data-es="Quién soy" data-en="About me">Quién soy</span>
+      </a>
+    </nav>
+
+  </aside>
 
   <!-- Popup de bienvenida (pide nombre, lo guarda en localStorage) -->
   <div class="popup-overlay" id="popupOverlay">
@@ -635,15 +628,33 @@ window.VADER_PARTS = VADER_PARTS;
       <div class="fs fs-7"></div>
       <div class="fs fs-8"></div>
     </div>
-    <div style="position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; gap:32px;">
-      <!-- PRIMERO: Vader -->
-      <div id="vaderContainer-inicio" style="width:100%; max-width:900px; height:650px; flex-shrink:0; border-radius:16px; overflow:hidden; cursor:grab; z-index:5;"></div>
-      <!-- SEGUNDO: texto de bienvenida -->
-      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; z-index:2;" class="bienvenida-titulo">
-        <span data-es="Bienvenido" data-en="Welcome">Bienvenido</span>
-        <span id="nombreUsuario" class="bienvenida-nombre"></span>
-        <span data-es="a mi blog personal" data-en="to my personal blog">a mi blog personal</span>
+    <div style="position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; text-align:center; justify-content:flex-start; width:100%; padding-top:80px; gap:28px;">
+      <!-- 1. Título de bienvenida -->
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+
+        <span style="font-family:'Satoshi','Inter',sans-serif; font-size:clamp(28px,3.5vw,48px); font-weight:700; color:#FFFFFF; letter-spacing:-0.5px;" data-es="Bienvenido" data-en="Welcome">Bienvenido</span>
+
+        <div style="position:relative; display:inline-block;">
+          <div style="position:absolute; inset:-20px; background:#2EA6FF; filter:blur(40px); opacity:0.22; border-radius:50%; pointer-events:none;"></div>
+          <span id="nombreUsuario" style="font-family:'Satoshi','Inter',sans-serif; font-size:clamp(42px,5.5vw,80px); font-weight:800; letter-spacing:-2px; font-style:italic; background:linear-gradient(90deg,#6EC8FF,#8ED7FF,#4DA6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-shadow:none; filter:drop-shadow(0 0 12px rgba(110,200,255,0.6)) drop-shadow(0 0 30px rgba(110,200,255,0.35)); animation:breathe 4s ease-in-out infinite; display:inline-block; position:relative;"></span>
+        </div>
+
+        <div style="width:140px; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,#6EC8FF,transparent); box-shadow:0 0 8px rgba(110,200,255,0.6); margin:4px 0;"></div>
+
+        <span style="font-family:'Space Grotesk','Inter',sans-serif; font-size:clamp(18px,2vw,28px); font-weight:500; color:rgba(255,255,255,0.75); letter-spacing:2px; text-transform:uppercase;" data-es="Mi Blog Personal" data-en="My Personal Blog">Mi Blog Personal</span>
+
       </div>
+      <!-- 2. Texto descriptivo -->
+      <div style="max-width:560px; display:flex; flex-direction:column; gap:12px; padding:0 24px; text-align:center;">
+        <p style="font-family:'Inter',sans-serif; font-size:clamp(15px,1.4vw,18px); line-height:1.9; color:#C2C2C2; font-weight:400;" data-es="Soy Konstantino. Creé este espacio para compartir proyectos, ideas y experiencias que forman parte de mi camino." data-en="I'm Konstantino. I created this space to share projects, ideas and experiences that are part of my journey.">
+          Soy Konstantino. Creé este espacio para compartir proyectos, ideas y experiencias que forman parte de mi camino.
+        </p>
+        <p style="font-family:'Inter',sans-serif; font-size:clamp(13px,1.2vw,16px); line-height:1.8; color:rgba(255,255,255,0.45); font-style:italic;" data-es="Si disfrutás el diseño, al final encontrarás una forma de valorarlo. Y para arrancar... ¡disfrutá el muñequito! 👇" data-en="If you enjoy the design, at the end you'll find a way to rate it. And to start... enjoy the little figure! 👇">
+          Si disfrutás el diseño, al final encontrarás una forma de valorarlo. Y para arrancar... ¡disfrutá el muñequito! 👇
+        </p>
+      </div>
+      <!-- 3. Dark Vader -->
+      <div id="vaderContainer-inicio" style="width:100%; max-width:900px; height:650px; flex-shrink:0; border-radius:16px; overflow:hidden; cursor:grab; z-index:5;"></div>
     </div>
   </section>
 
@@ -2856,6 +2867,32 @@ document.addEventListener('DOMContentLoaded', () => {
     initVaderInicio();
   })();
   }); // window load
+  </script>
+
+  <script>
+    const trigger = document.getElementById('nav-trigger');
+    const sidebar = document.getElementById('nav-sidebar');
+    const overlay = document.getElementById('nav-overlay');
+
+    trigger.addEventListener('click', () => {
+      const isOpen = sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)';
+      sidebar.style.transform = isOpen ? 'translateX(-100%)' : 'translateX(0)';
+      overlay.style.display = isOpen ? 'none' : 'block';
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.style.transform = 'translateX(-100%)';
+      overlay.style.display = 'none';
+    });
+
+    function navTo(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      sidebar.style.transform = 'translateX(-100%)';
+      overlay.style.display = 'none';
+    }
   </script>
 
 </body>
