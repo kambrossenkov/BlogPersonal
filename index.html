@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -680,6 +680,79 @@ window.VADER_PARTS = VADER_PARTS;
         <span>👤</span> <span data-es="Quién soy" data-en="About me">Quién soy</span>
       </a>
     </nav>
+
+<!-- Separador + Contacto en el footer del sidebar -->
+<div style="
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+">
+
+  <!-- Email -->
+  <a href="mailto:k.ambrossenkov@gmail.com" style="
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+  " onmouseover="this.style.color='rgba(255,255,255,0.9)'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    </svg>
+    k.ambrossenkov@gmail.com
+  </a>
+
+  <!-- Instagram -->
+  <a href="https://www.instagram.com/" target="_blank" style="
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+  " onmouseover="this.style.color='rgba(255,255,255,0.9)'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+    </svg>
+    Instagram
+  </a>
+
+  <!-- LinkedIn -->
+  <a href="https://www.linkedin.com/" target="_blank" style="
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+  " onmouseover="this.style.color='rgba(255,255,255,0.9)'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/>
+    </svg>
+    LinkedIn
+  </a>
+
+  <!-- Tagline -->
+  <p style="
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 4px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  ">Estoy para ayudar</p>
+
+</div>
 
   </aside>
 
@@ -1614,6 +1687,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    let animId1;
     function animate() {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "#000000"); gradient.addColorStop(1, "#0a0f1a");
@@ -1624,11 +1698,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (beam.y + beam.length < -50) { beam.y = window.innerHeight + 50; beam.x = Math.random() * window.innerWidth; }
             drawBeam(beam);
         });
-        requestAnimationFrame(animate);
+        animId1 = requestAnimationFrame(animate);
     }
 
     window.addEventListener("resize", resizeCanvas);
-    resizeCanvas(); generateNoise(); animate();
+    resizeCanvas(); generateNoise();
+    
+    const obs1 = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            if (!animId1) animate();
+        } else {
+            if (animId1) { cancelAnimationFrame(animId1); animId1 = null; }
+        }
+    });
+    obs1.observe(canvas);
 
     const accordionData = [
         { id: 3, title: 'Músicas', imageUrl: 'Fotos/portada_musicas.jpg', link: 'musicas.html' },
@@ -2179,9 +2262,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const vignette = ctx.createRadialGradient(width/2, height/2, height*0.3, width/2, height/2, Math.max(width, height) * 0.75);
           vignette.addColorStop(0, 'rgba(0,0,0,0)'); vignette.addColorStop(1, 'rgba(0,0,0,0.9)');
           ctx.fillStyle = vignette; ctx.fillRect(0,0,width,height);
-          requestAnimationFrame(draw);
+          animId2 = requestAnimationFrame(draw);
         }
-        draw();
+        let animId2;
+        const obs2 = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) { if (!animId2) draw(); }
+          else { if (animId2) { cancelAnimationFrame(animId2); animId2 = null; } }
+        });
+        obs2.observe(canvas);
       })();
     </script>
     <script>
@@ -2808,11 +2896,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const materialTray = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms: uniformsTray, depthWrite: false, depthTest: false });
   const meshTray = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), materialTray);
   sceneTray.add(meshTray);
-  (function animate() {
-    requestAnimationFrame(animate);
+  let animId3;
+  function animateTray() {
+    animId3 = requestAnimationFrame(animateTray);
     uniformsTray.iTime.value += 0.008;
     rendererTray.render(sceneTray, cameraTray);
-  })();
+  }
+  const obs3 = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting) { if(!animId3) animateTray(); }
+    else { if(animId3) { cancelAnimationFrame(animId3); animId3 = null; } }
+  });
+  obs3.observe(section);
   window.addEventListener('resize', () => {
     rendererTray.setSize(section.offsetWidth, section.offsetHeight);
     uniformsTray.iResolution.value.set(section.offsetWidth, section.offsetHeight);
@@ -3063,12 +3157,17 @@ document.addEventListener('DOMContentLoaded', () => {
         renderer.setSize(W, H);
       });
 
+      let animId4;
       function animate() {
-        requestAnimationFrame(animate);
+        animId4 = requestAnimationFrame(animate);
         if (controls) controls.update();
         renderer.render(scene, camera);
       }
-      animate();
+      const obs4 = new IntersectionObserver(entries => {
+        if(entries[0].isIntersecting) { if(!animId4) animate(); }
+        else { if(animId4) { cancelAnimationFrame(animId4); animId4 = null; } }
+      });
+      obs4.observe(container);
     }
     initVaderInicio();
   })();
