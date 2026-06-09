@@ -709,7 +709,7 @@ window.VADER_PARTS = VADER_PARTS;
   </a>
 
   <!-- Instagram -->
-  <a href="https://www.instagram.com/" target="_blank" style="
+  <a href="https://www.instagram.com/konsta_ambrossenkov/?__d=1" target="_blank" style="
     display: flex;
     align-items: center;
     gap: 10px;
@@ -726,7 +726,7 @@ window.VADER_PARTS = VADER_PARTS;
   </a>
 
   <!-- LinkedIn -->
-  <a href="https://www.linkedin.com/" target="_blank" style="
+  <a href="https://www.linkedin.com/in/konstantino-ambrossenkov/" target="_blank" style="
     display: flex;
     align-items: center;
     gap: 10px;
@@ -2471,6 +2471,55 @@ document.addEventListener('DOMContentLoaded', () => {
               </a>
             </div>
           </div>
+
+          <!-- Línea divisoria sutil para separar contacto de feedback -->
+          <div class="w-full h-px bg-white/10 my-8"></div>
+
+          <!-- Sección de Reacciones integrada -->
+          <div class="flex flex-col items-center gap-5 w-full">
+            <!-- Título con la misma tipografía que "¿Querés Charlar?" -->
+            <h3 class="text-4xl md:text-5xl font-bold tracking-tight text-white text-center opacity-90" data-es="¿Te gustó la página?" data-en="Did you like the page?">
+              ¿Te gustó la página?
+            </h3>
+            
+            <!-- Botones de reacción -->
+            <div class="flex items-center justify-center gap-4">
+              <div class="heart-container" title="Me gustó">
+                <input type="checkbox" class="checkbox" id="vote-like">
+                <div class="svg-container">
+                  <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                  </svg>
+                  <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                  </svg>
+                  <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="10,10 20,20"></polygon>
+                    <polygon points="10,50 20,50"></polygon>
+                    <polygon points="20,80 30,70"></polygon>
+                    <polygon points="90,10 80,20"></polygon>
+                    <polygon points="90,50 80,50"></polygon>
+                    <polygon points="80,80 70,70"></polygon>
+                  </svg>
+                </div>
+              </div>
+
+              <button class="vote-btn-neutral" title="No sé">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="8" y1="15" x2="16" y2="15"></line>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+              </button>
+
+              <button class="vote-btn-dislike" title="No me gustó">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="#cc2200" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -2572,53 +2621,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.addEventListener('DOMContentLoaded', () => { ['perfilNombre', 'perfilEmail'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') submitPerfilPopup(); }); }); });
     </script>
 
-  <!-- Tarjeta de votación -->
-  <div style="width:100%; max-width:480px; margin:24px auto 0; background:rgba(15,20,40,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:40px 32px; text-align:center; backdrop-filter:blur(12px); display:flex; flex-direction:column; align-items:center; gap:24px;">
 
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <p style="font-family:'Space Grotesk','Inter',sans-serif; font-size:clamp(20px,2.2vw,26px); font-weight:700; color:#FFFFFF; margin:0; letter-spacing:-0.3px;" data-es="¿Te gustó la página?" data-en="Did you like the page?">¿Te gustó la página?</p>
-    </div>
-
-    <div style="display:flex; align-items:center; justify-content:center; gap:36px; margin-top:8px;">
-
-      <div class="heart-container" title="Me gustó">
-        <input type="checkbox" class="checkbox" id="vote-like">
-        <div class="svg-container">
-          <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
-          </svg>
-          <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
-          </svg>
-          <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="10,10 20,20"></polygon>
-            <polygon points="10,50 20,50"></polygon>
-            <polygon points="20,80 30,70"></polygon>
-            <polygon points="90,10 80,20"></polygon>
-            <polygon points="90,50 80,50"></polygon>
-            <polygon points="80,80 70,70"></polygon>
-          </svg>
-        </div>
-      </div>
-
-      <button class="vote-btn-neutral" title="No sé">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="8" y1="15" x2="16" y2="15"></line>
-          <line x1="9" y1="9" x2="9.01" y2="9"></line>
-          <line x1="15" y1="9" x2="15.01" y2="9"></line>
-        </svg>
-      </button>
-
-      <button class="vote-btn-dislike" title="No me gustó">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#cc2200" stroke-width="3.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-
-    </div>
-
-  </div>
 
   <!-- Modal de artículos -->
   <div id="article-modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px);" onclick="cerrarArticleModal(event)">
@@ -2981,6 +2984,8 @@ document.addEventListener('DOMContentLoaded', () => {
       controls.enabled = true;
       controls.minPolarAngle = Math.PI / 4;
       controls.maxPolarAngle = Math.PI / 1.5;
+      controls.target.set(0, 0, 0);
+      controls.update();
 
       scene.add(new THREE.AmbientLight(0xffffff, 0.25));
 
@@ -3006,7 +3011,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. Disco rojo base
       const discoRojo = new THREE.Mesh(
         new THREE.CylinderGeometry(2.75, 2.75, 0.14, 64),
-        new THREE.MeshStandardMaterial({color:0xC62828, roughness:0.6, metalness:0.1})
+        new THREE.MeshStandardMaterial({color:0x6b0000, roughness:0.8, metalness:0.0})
       );
       discoRojo.position.y = -4.2;
       scene.add(discoRojo);
@@ -3063,12 +3068,14 @@ document.addEventListener('DOMContentLoaded', () => {
       luzVioleta.position.set(0, -4.6, 0);
       scene.add(luzVioleta);
 
-      const luzRoja = new THREE.PointLight(0xC62828, 1.2, 8);
+      const luzRoja = new THREE.PointLight(0x6b0000, 1.2, 8);
       luzRoja.position.set(0, -3.8, 0);
       scene.add(luzRoja);
 
       const figure = new THREE.Group();
+      figure.rotation.y = Math.PI;
       scene.add(figure);
+      console.log('figure.rotation.y =', figure.rotation.y);
 
       const headGroup = new THREE.Group();
       headGroup.position.y = 2.8;
@@ -3156,7 +3163,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const ry = (Math.random() - 0.5) * 0.5;
           const dur = 1.2 + Math.random() * 0.8;
           gsap.to(figure.rotation, {
-            y: ry, duration: dur, ease: 'sine.inOut',
+            y: Math.PI + ry, duration: dur, ease: 'sine.inOut',
             onComplete: () => {
               if (isIdle) mouseTimeout = setTimeout(lookAround, Math.random() * 1200 + 600);
             }
@@ -3169,7 +3176,7 @@ document.addEventListener('DOMContentLoaded', () => {
           clearTimeout(mouseTimeout);
           gsap.killTweensOf(figure.rotation);
           const mx = (e.clientX / window.innerWidth) * 2 - 1;
-          gsap.to(figure.rotation, { y: mx * 0.7, duration: 0.6, ease: 'power2.out' });
+          gsap.to(figure.rotation, { y: Math.PI + mx * 0.7, duration: 0.6, ease: 'power2.out' });
           mouseTimeout = setTimeout(() => { isIdle = true; lookAround(); }, 2000);
         });
       }
