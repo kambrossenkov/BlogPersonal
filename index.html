@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" href="data:,">
+  <link rel="icon" type="image/jpeg" href="Fotos/firma AK.jfif">
+  <link rel="apple-touch-icon" href="Fotos/firma AK.jfif">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog Personal</title>
+  <title>Konstantino Blog</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <!-- Fuentes Bloque 2 — Trayectoria -->
@@ -636,6 +637,20 @@ window.VADER_PARTS = VADER_PARTS;
       transform: scale(0.88);
       box-shadow: 0 0 0 4px rgba(37,99,235,0.35);
       background: rgba(37,99,235,0.4);
+    }
+    @media (max-width: 768px) {
+      #vaderContainer-inicio {
+        width: 220px !important;
+        height: 280px !important;
+        max-width: 220px !important;
+      }
+    }
+    @media (max-width: 480px) {
+      #vaderContainer-inicio {
+        width: 180px !important;
+        height: 220px !important;
+        max-width: 180px !important;
+      }
     }
   </style>
 </head>
@@ -3027,6 +3042,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <script>
   window.addEventListener('load', function () {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     console.log('VADER_PARTS tipo:', typeof window.VADER_PARTS);
     console.log('VADER_PARTS keys:', window.VADER_PARTS ? Object.keys(window.VADER_PARTS) : 'null');
   (function () {
@@ -3267,11 +3285,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      window.addEventListener('resize', () => {
-        camera.aspect = W / H;
-        camera.updateProjectionMatrix();
-        renderer.setSize(W, H);
+      const resizeObserver = new ResizeObserver(() => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        if (w > 0 && h > 0) {
+          renderer.setSize(w, h);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+        }
       });
+      resizeObserver.observe(container);
 
       let animId4;
       function animate() {
