@@ -638,6 +638,14 @@ window.VADER_PARTS = VADER_PARTS;
       box-shadow: 0 0 0 4px rgba(37,99,235,0.35);
       background: rgba(37,99,235,0.4);
     }
+    @keyframes toastEntrar {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes toastSalir {
+      from { opacity: 1; transform: translateX(-50%) translateY(0); }
+      to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
     @media (max-width: 768px) {
       #vaderContainer-inicio {
         width: 220px !important;
@@ -2116,134 +2124,170 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </section>
 
-        <!-- Section 3: Cuadrante 4 — Efectos de scroll down (carousel) -->
+        <!-- Section 3: Efectos de scroll down — carousel -->
         <section style="width:100%;padding:0;position:relative;">
-          <style>
-            .q4{width:100%;padding:3rem 0 3.5rem;box-sizing:border-box;position:relative;}
-            .q4-header{display:flex;align-items:flex-start;margin-bottom:2.5rem;}
-            .q4-heading h2{font-size:26px;font-weight:700;color:#f0f0f0;margin:0;}
-            .q4-wrap{position:relative;}
-            .q4-arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,0.5);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background 0.2s;}
-            .q4-arrow:hover{background:rgba(255,255,255,0.15);}
-            .q4-arrow.left{left:-21px;}
-            .q4-arrow.right{right:-21px;}
-            .q4-arrow:disabled{opacity:0.2;cursor:default;}
-            .q4-outer{overflow:hidden;width:100%;}
-            .q4-track{display:flex;gap:18px;transition:transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94);}
-            .q4-card{flex:0 0 280px;height:360px;border-radius:18px;overflow:hidden;position:relative;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:#111;}
-            .q4-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;}
-            .q4-card:hover img{transform:scale(1.04);}
-            .q4-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 50%);opacity:0;transition:opacity 0.3s ease;display:flex;align-items:flex-end;padding:20px;}
-            .q4-card:hover .q4-card-overlay{opacity:1;}
-            .q4-card-overlay h3{font-size:17px;font-weight:700;color:#fff;margin:0;line-height:1.2;}
-            .q4-placeholder-bg{width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;}
-            .q4-placeholder-bg span{font-size:13px;color:#999;letter-spacing:1px;}
-            .q4-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;}
-            .q4-modal-backdrop.open{display:flex;}
-            .q4-modal{background:#111;border-radius:20px;max-width:600px;width:90%;overflow:hidden;border:1px solid rgba(255,255,255,0.12);position:relative;}
-            .q4-modal img{width:100%;height:280px;object-fit:cover;display:block;}
-            .q4-modal-body{padding:24px;}
-            .q4-modal-body h3{font-size:22px;font-weight:700;color:#f0f0f0;margin:0 0 10px 0;}
-            .q4-modal-body p{font-size:14px;color:rgba(255,255,255,0.6);margin:0 0 20px 0;line-height:1.6;}
-            .q4-modal-btn{display:inline-block;padding:10px 24px;background:#fff;color:#000;border-radius:30px;font-size:14px;font-weight:600;text-decoration:none;transition:opacity 0.2s;}
-            .q4-modal-btn:hover{opacity:0.85;}
-            .q4-modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
-          </style>
 
-          <div class="q4">
-            <div class="q4-header">
-              <div class="q4-heading">
-                <h2>Efectos de scroll down</h2>
+          <!-- Título y subtexto -->
+          <div style="margin-bottom:32px;">
+            <h2 style="font-family:'General Sans','Inter',sans-serif; font-size:clamp(32px,4vw,52px); font-weight:700; color:white; margin-bottom:12px;">Efectos de scroll down</h2>
+            <p style="font-family:'Inter',sans-serif; font-size:16px; line-height:1.7; color:rgba(255,255,255,0.55); max-width:600px;">Tenés que scrollear para abajo en cualquiera de estas plantillas que quieras ingresar y disfrutarlo.</p>
+          </div>
+
+          <!-- Carousel -->
+          <div style="position:relative; width:100%;">
+            <div style="overflow:hidden; border-radius:20px; width:100%; height:560px;">
+              <div id="sd-track" style="display:flex; transition:transform 0.4s ease; height:100%;">
+
+                <!-- SLIDE 1 -->
+                <div style="min-width:100%; width:100%; box-sizing:border-box; cursor:pointer; height:100%;" onclick="abrirModalScrolldown()">
+                  <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; height:100%; display:flex; flex-direction:column;">
+                    <img src="Fotos/foto_portada_de_cartas.jpg" style="width:100%; height:380px; object-fit:cover; display:block; flex-shrink:0;">
+                    <div style="padding:20px; flex:1; overflow:hidden;">
+                      <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px;">The Gravitational Card-Cascade</h3>
+                      <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SLIDE 2 -->
+                <div style="min-width:100%; width:100%; box-sizing:border-box; height:100%;">
+                  <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; height:100%; display:flex; align-items:center; justify-content:center;">
+                    <p style="color:rgba(255,255,255,0.25); font-size:13px; letter-spacing:3px; text-transform:uppercase;">Próximamente</p>
+                  </div>
+                </div>
+
+                <!-- SLIDE 3 -->
+                <div style="min-width:100%; width:100%; box-sizing:border-box; height:100%;">
+                  <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; height:100%; display:flex; align-items:center; justify-content:center;">
+                    <p style="color:rgba(255,255,255,0.25); font-size:13px; letter-spacing:3px; text-transform:uppercase;">Próximamente</p>
+                  </div>
+                </div>
+
               </div>
             </div>
-            <div class="q4-wrap">
-              <button class="q4-arrow left" id="q4prev" disabled aria-label="Anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
-              <div class="q4-outer">
-                <div class="q4-track" id="q4track">
-                  <div class="q4-card" onclick="q4OpenModal(0)"><img src="Fotos/foto_portada_de_cartas.jpg" alt="The Gravitational Card-Cascade"><div class="q4-card-overlay"><h3>The Gravitational Card-Cascade</h3></div></div>
-                  <div class="q4-card" onclick="q4OpenModal(1)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 2</h3></div></div>
-                  <div class="q4-card" onclick="q4OpenModal(2)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 3</h3></div></div>
-                  <div class="q4-card" onclick="q4OpenModal(3)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 4</h3></div></div>
-                  <div class="q4-card" onclick="q4OpenModal(4)"><div class="q4-placeholder-bg"><span>PRÓXIMAMENTE</span></div><div class="q4-card-overlay"><h3>Título 5</h3></div></div>
+            <button onclick="sdPrev()" style="position:absolute; left:-16px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.15); color:white; cursor:pointer; font-size:18px; z-index:10;">‹</button>
+            <button onclick="sdNext()" style="position:absolute; right:-16px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.15); color:white; cursor:pointer; font-size:18px; z-index:10;">›</button>
+          </div>
+
+          <script>
+            var sdIdx = 0;
+            function sdNext() {
+              sdIdx = (sdIdx + 1) % 3;
+              document.getElementById('sd-track').style.transform = 'translateX(-' + (sdIdx * 100) + '%)';
+            }
+            function sdPrev() {
+              sdIdx = (sdIdx + 2) % 3;
+              document.getElementById('sd-track').style.transform = 'translateX(-' + (sdIdx * 100) + '%)';
+            }
+            function abrirModalScrolldown() {
+              document.getElementById('article-modal-tag').textContent = 'INVENTOS';
+              document.getElementById('article-modal-date').textContent = 'Mar 2025';
+              document.getElementById('article-modal-title').textContent = 'Efectos de scroll down';
+              document.getElementById('article-modal-text').textContent = 'En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.';
+              var img = document.getElementById('article-modal-img');
+              img.src = 'Fotos/foto_portada_de_cartas.jpg';
+              img.style.display = 'block';
+              var link = document.getElementById('article-modal-link');
+              link.href = 'card-cascade-scroll.html';
+              link.style.display = 'inline-flex';
+              document.getElementById('article-modal-overlay').style.display = 'block';
+              document.body.style.overflow = 'hidden';
+            }
+          </script>
+        </section>
+
+        <!-- Section 4: Simulación del Océano — carousel -->
+        <section style="width:100%;padding:0;position:relative;">
+          <div style="margin-bottom: 32px;">
+            <h2 style="font-family: 'General Sans', 'Inter', sans-serif; font-size: clamp(32px, 4vw, 52px); font-weight: 700; color: white; margin-bottom: 12px;">Efectos inmersivos</h2>
+            <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.55); max-width: 600px;">Apartados que te redireccionan a lugares inmersivos, los cuales tardan en cargar, por lo cual hay que ser paciente, pero no tardan más de dos minutos en cargarse, y son bastante divertidos.</p>
+          </div>
+          <div style="position:relative; overflow:hidden; border-radius:16px; border:1px solid rgba(255,255,255,0.08); height:420px;">
+            <div id="ocean-carousel" style="display:flex; transition:transform 0.4s ease; height:100%;">
+              <!-- Slide 1: Océano -->
+              <div style="flex:0 0 100%; box-sizing:border-box; padding:24px;">
+                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; cursor:pointer;" onclick="oceanOpenModal(0)">
+                  <div style="width:100%; height:240px; background:#000; background-image:linear-gradient(rgba(0,229,255,0.12) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.12) 1px,transparent 1px); background-size:32px 32px; display:flex; align-items:center; justify-content:center;">
+                    <span style="color:#ffffff; font-size:1.1rem; font-weight:700; letter-spacing:0.05em; pointer-events:none;">🌊 SIMULACIÓN OCEÁNICA</span>
+                  </div>
+                  <div style="padding:20px;">
+                    <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px 0;">Simulación del Océano</h3>
+                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Vista en el medio del océano, disfrutalo.</p>
+                  </div>
                 </div>
               </div>
-              <button class="q4-arrow right" id="q4next" aria-label="Siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+              <!-- Slide 2: PRÓXIMAMENTE -->
+              <div style="flex:0 0 100%; box-sizing:border-box; padding:24px;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:20px; overflow:hidden; cursor:pointer; height:calc(100% - 0px); display:flex; align-items:center; justify-content:center;" onclick="oceanOpenModal(1)">
+                  <div style="text-align:center;">
+                    <p style="color:rgba(255,255,255,0.4); font-size:11px; letter-spacing:2px; text-transform:uppercase; margin:0 0 12px 0;">PRÓXIMAMENTE</p>
+                    <h3 style="color:rgba(255,255,255,0.25); font-size:20px; font-weight:700; margin:0;">En desarrollo</h3>
+                  </div>
+                </div>
+              </div>
+              <!-- Slide 3: PRÓXIMAMENTE -->
+              <div style="flex:0 0 100%; box-sizing:border-box; padding:24px;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:20px; overflow:hidden; cursor:pointer; height:calc(100% - 0px); display:flex; align-items:center; justify-content:center;" onclick="oceanOpenModal(2)">
+                  <div style="text-align:center;">
+                    <p style="color:rgba(255,255,255,0.4); font-size:11px; letter-spacing:2px; text-transform:uppercase; margin:0 0 12px 0;">PRÓXIMAMENTE</p>
+                    <h3 style="color:rgba(255,255,255,0.25); font-size:20px; font-weight:700; margin:0;">En desarrollo</h3>
+                  </div>
+                </div>
+              </div>
             </div>
+            <button onclick="oceanPrev()" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.15); color:white; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; line-height:1;">‹</button>
+            <button onclick="oceanNext()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.15); color:white; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; line-height:1;">›</button>
           </div>
-          <div class="q4-modal-backdrop" id="q4modal">
-            <div class="q4-modal" id="q4modalinner">
-              <button class="q4-modal-close" onclick="q4CloseModal()">×</button>
-              <img id="q4modal-img" src="" alt="">
-              <div class="q4-modal-body">
-                <h3 id="q4modal-title"></h3>
-                <p id="q4modal-desc"></p>
-                <a id="q4modal-link" href="#" target="_blank" class="q4-modal-btn">Ver proyecto →</a>
+          <!-- Modal océano -->
+          <div id="ocean-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px;" onclick="oceanCloseModal(event)">
+            <div style="background:#111; border-radius:20px; max-width:600px; width:100%; overflow:hidden; border:1px solid rgba(255,255,255,0.12); position:relative;" onclick="event.stopPropagation()">
+              <div id="ocean-modal-preview" style="width:100%; min-height:220px; display:flex; align-items:center; justify-content:center;"></div>
+              <button onclick="document.getElementById('ocean-modal').style.display='none'" style="position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,0.3); background:rgba(0,0,0,0.5); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;">×</button>
+              <div style="padding:24px;">
+                <h3 id="ocean-modal-title" style="font-size:22px; font-weight:700; color:#f0f0f0; margin:0 0 10px 0;"></h3>
+                <p id="ocean-modal-desc" style="font-size:14px; color:rgba(255,255,255,0.6); margin:0 0 20px 0; line-height:1.6;"></p>
+                <a id="ocean-modal-link" href="#" target="_blank" style="display:inline-block; padding:10px 24px; background:#fff; color:#000; border-radius:30px; font-size:14px; font-weight:600; text-decoration:none;">Ir al sitio →</a>
               </div>
             </div>
           </div>
           <script>
-            (function(){
-              const data = [
-                { title: "The Gravitational Card-Cascade", desc: "En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.", img: "Fotos/foto_portada_de_cartas.jpg", url: "card-cascade-scroll.html" },
-                { title: "Título 2", desc: "Descripción del proyecto 2. Próximamente.", img: "", url: "#" },
-                { title: "Título 3", desc: "Descripción del proyecto 3. Próximamente.", img: "", url: "#" },
-                { title: "Título 4", desc: "Descripción del proyecto 4. Próximamente.", img: "", url: "#" },
-                { title: "Título 5", desc: "Descripción del proyecto 5. Próximamente.", img: "", url: "#" }
-              ];
-              const tr = document.getElementById('q4track');
-              const pv = document.getElementById('q4prev');
-              const nx = document.getElementById('q4next');
-              const step = 298; const total = data.length; let cur = 0; let isTransitioning = false;
-              function getCards(){ return tr.querySelectorAll('.q4-card'); }
-              function cloneEdges(){
-                const cards = Array.from(getCards());
-                const clonesEnd = cards.slice(0,2).map(c=>{ const cl=c.cloneNode(true); cl.setAttribute('data-clone','true'); return cl; });
-                const clonesStart = cards.slice(-2).map(c=>{ const cl=c.cloneNode(true); cl.setAttribute('data-clone','true'); return cl; });
-                clonesEnd.forEach(c=>tr.appendChild(c));
-                clonesStart.reverse().forEach(c=>tr.insertBefore(c,tr.firstChild));
-                cur = 2; tr.style.transition = 'none'; tr.style.transform = 'translateX(-'+(cur*step)+'px)';
+            var oceanIndex = 0;
+            function oceanNext() {
+              oceanIndex = (oceanIndex + 1) % 3;
+              document.getElementById('ocean-carousel').style.transform = 'translateX(-' + (oceanIndex * 100) + '%)';
+            }
+            function oceanPrev() {
+              oceanIndex = (oceanIndex + 2) % 3;
+              document.getElementById('ocean-carousel').style.transform = 'translateX(-' + (oceanIndex * 100) + '%)';
+            }
+            var oceanSlides = [
+              { title: 'Simulación del Océano', desc: 'Vista en el medio del océano, disfrútalo.', url: 'oceano.html', ocean: true },
+              { title: 'Próximamente', desc: 'Contenido en desarrollo. Volvé pronto.', url: '#', ocean: false },
+              { title: 'Próximamente', desc: 'Contenido en desarrollo. Volvé pronto.', url: '#', ocean: false }
+            ];
+            function oceanOpenModal(i) {
+              var d = oceanSlides[i];
+              var preview = document.getElementById('ocean-modal-preview');
+              document.getElementById('ocean-modal-title').textContent = d.title;
+              document.getElementById('ocean-modal-desc').textContent = d.desc;
+              var link = document.getElementById('ocean-modal-link');
+              link.href = d.url;
+              link.style.display = d.url === '#' ? 'none' : 'inline-block';
+              if (d.ocean) {
+                preview.style.cssText = 'width:100%; min-height:220px; display:flex; align-items:center; justify-content:center; background:#000; background-image:linear-gradient(rgba(0,229,255,0.12) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.12) 1px,transparent 1px); background-size:32px 32px;';
+                preview.innerHTML = '<span style="color:#fff;font-size:1.25rem;font-weight:700;letter-spacing:0.05em;">🌊 SIMULACIÓN OCEÁNICA</span>';
+              } else {
+                preview.style.cssText = 'width:100%; min-height:220px; display:flex; align-items:center; justify-content:center; background:#111;';
+                preview.innerHTML = '<span style="font-size:13px;color:#999;letter-spacing:1px;">PRÓXIMAMENTE</span>';
               }
-              function upd(animate){
-                if(animate === false){ tr.style.transition = 'none'; } else { tr.style.transition = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94)'; }
-                tr.style.transform = 'translateX(-'+(cur*step)+'px)'; pv.disabled = false; nx.disabled = false;
+              document.getElementById('ocean-modal').style.display = 'flex';
+            }
+            function oceanCloseModal(e) {
+              if (e.target === document.getElementById('ocean-modal')) {
+                document.getElementById('ocean-modal').style.display = 'none';
               }
-              cloneEdges();
-              const realTotal = tr.querySelectorAll('.q4-card').length;
-              nx.onclick = function(){ if(isTransitioning) return; isTransitioning = true; cur++; upd(true); };
-              pv.onclick = function(){ if(isTransitioning) return; isTransitioning = true; cur--; upd(true); };
-              tr.addEventListener('transitionend', function(){
-                isTransitioning = false; const clonesBefore = 2; const realEnd = clonesBefore + total - 1;
-                if(cur <= clonesBefore - 1){ cur = clonesBefore + total - (clonesBefore - cur); upd(false); }
-                else if(cur >= realEnd + 1){ cur = clonesBefore + (cur - realEnd - 1); upd(false); }
-              });
-              window.q4OpenModal = function(i){
-                const idx = i % total; const d = data[idx]; const imgEl = document.getElementById('q4modal-img');
-                imgEl.src = d.img || ''; imgEl.style.display = d.img ? 'block' : 'none';
-                document.getElementById('q4modal-title').textContent = d.title; document.getElementById('q4modal-desc').textContent = d.desc;
-                const link = document.getElementById('q4modal-link'); link.href = d.url; link.onclick = d.url === '#' ? (e)=>e.preventDefault() : null;
-                document.getElementById('q4modal').classList.add('open');
-              };
-              window.q4CloseModal = function(){ document.getElementById('q4modal').classList.remove('open'); };
-              document.getElementById('q4modal').addEventListener('click', function(e){ if(e.target === this) q4CloseModal(); });
-            })();
+            }
           </script>
-        </section>
-
-        <!-- Section 4: Text Left, Image Right -->
-        <section class="flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
-          <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
-            <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight transition-colors" data-es="Simulación del Océano" data-en="Ocean Simulation">Simulación del Océano</h2>
-            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Vista en el medio del océano, disfrútalo." data-en="A view from the middle of the ocean, enjoy it.">Vista en el medio del océano, disfrútalo.</p>
-            <div class="pt-2">
-              <a href="oceano.html" target="_blank" class="text-blue-400 hover:text-blue-300 relative z-10 font-bold transition-colors" data-es="Explorar →" data-en="Explore →">Explorar →</a>
-            </div>
-          </div>
-          <div class="w-full md:w-1/2 order-1 md:order-2">
-            <div onclick="window.location.href='oceano.html'" style="position:relative;width:100%;aspect-ratio:3/2;border-radius:0.75rem;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);cursor:pointer;transition:box-shadow 0.5s ease,border-color 0.3s ease;background-image:linear-gradient(rgba(0,229,255,0.12) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.12) 1px,transparent 1px);background-size:32px 32px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.boxShadow='0 0 30px rgba(0,229,255,0.35),0 25px 50px -12px rgba(0,0,0,0.5)';this.style.borderColor='rgba(0,229,255,0.5)';this.querySelector('.ocean-hover-text').style.opacity='1';this.querySelector('.ocean-main-text').style.opacity='0';" onmouseout="this.style.boxShadow='0 25px 50px -12px rgba(0,0,0,0.5)';this.style.borderColor='rgba(255,255,255,0.1)';this.querySelector('.ocean-hover-text').style.opacity='0';this.querySelector('.ocean-main-text').style.opacity='1';">
-              <span class="ocean-main-text" style="color:#ffffff;font-size:1.25rem;font-weight:700;letter-spacing:0.05em;text-align:center;transition:opacity 0.3s ease;pointer-events:none;">🌊 SIMULACIÓN OCEÁNICA</span>
-              <span class="ocean-hover-text" data-es="Haz clic para explorar" data-en="Click to explore" style="position:absolute;color:#ffffff;font-size:1rem;font-weight:500;text-align:center;opacity:0;transition:opacity 0.3s ease;pointer-events:none;">Haz clic para explorar</span>
-            </div>
-          </div>
         </section>
       </div>
     </main>
@@ -2403,6 +2447,18 @@ document.addEventListener('DOMContentLoaded', () => {
       #global-bg-perf { position: absolute; inset: 0; z-index: 0; background: #000; overflow: hidden; pointer-events: none; }
       .meteor { position: absolute; width: 2px; height: 100px; background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%); transform: rotate(45deg); opacity: 0; animation: meteorFallPerf linear infinite; }
       @keyframes meteorFallPerf { 0% { transform: translateY(-200px) translateX(200px) rotate(45deg); opacity: 1; } 100% { transform: translateY(100vh) translateX(-100vh) rotate(45deg); opacity: 0; } }
+      @media (max-width: 768px) {
+        #perfil-hero { flex-direction: column !important; align-items: center !important; gap: 32px !important; padding: 40px 24px !important; }
+        #perfil-hero > div:first-child { flex: none !important; width: 100% !important; max-width: 320px !important; }
+        #perfil-hero > div:first-child img { height: 360px !important; border-radius: 20px !important; }
+        #perfil-hero > div:last-child { max-width: 100% !important; padding-top: 0 !important; text-align: center !important; }
+        #perfil-hero h2 { font-size: clamp(32px, 8vw, 48px) !important; }
+      }
+      @media (max-width: 480px) {
+        #perfil-hero > div:first-child { max-width: 260px !important; }
+        #perfil-hero > div:first-child img { height: 300px !important; }
+        #perfil-hero h2 { font-size: clamp(28px, 7vw, 38px) !important; }
+      }
     </style>
 
 
@@ -2419,23 +2475,71 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <section class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20 animate-slide-up">
-        <div class="relative h-[400px] md:h-[600px] rounded-[32px] overflow-hidden order-last md:order-first shadow-xl">
-          <img src="Fotos/1°.jpg" alt="Foto principal" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+      <div id="perfil-hero" style="
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 64px;
+        padding: 60px 48px;
+        max-width: 1200px;
+        margin: 0 auto;
+      ">
+        <div style="flex: 0 0 380px; width: 380px;">
+          <img src="Fotos/foto de perfil para la pagina.png" alt="Foto principal" style="
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            object-position: top;
+            border-radius: 24px;
+            display: block;
+          ">
         </div>
-        <div class="px-4 md:px-8">
-          <h1 data-i18n="hero-title" class="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-8 font-serif leading-[1.1] text-white transition-colors duration-300">
-            Pienso en sistemas. Ejecuto en resultados.
-          </h1>
-          <p data-i18n="hero-desc" class="text-lg text-white/70 mb-10 leading-relaxed max-w-lg transition-colors duration-300">
-            Soy Konstantino Ambrossenkov — graduado del ITBA, trabajo en datos y operaciones. Explorá mi trayectoria y proyectos acá.
+        <div style="
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+          padding-top: 12px;
+          max-width: 560px;
+        ">
+          <h2 style="
+            font-family: 'Satoshi', 'Inter', sans-serif;
+            font-size: clamp(40px, 4.5vw, 72px);
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1.12;
+            letter-spacing: -1px;
+            margin: 0;
+          ">
+            Una sucesión<br>
+            de pequeños pasos<br>
+            conlleva un gran<br>
+            <span style="color:#00D4FF; filter:drop-shadow(0 0 8px rgba(0,212,255,0.35));">resultado</span>
+          </h2>
+          <p style="
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(15px, 1.3vw, 18px);
+            line-height: 1.8;
+            color: rgba(255,255,255,0.72);
+            margin: 0;
+          ">
+            Una frase que siempre tengo presente porque representa muchos de los resultados que fui alcanzando a lo largo de mi vida.
+          </p>
+          <p style="
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(14px, 1.2vw, 17px);
+            line-height: 1.8;
+            color: rgba(255,255,255,0.72);
+            margin: 0;
+          ">
+            Si te interesó lo que viste hasta acá, te dejo algunos proyectos destacados desarrollados por cuenta propia. Y si querés conocer más sobre mi experiencia laboral, podés escribirme a través de mis contactos.
           </p>
         </div>
-      </section>
+      </div>
 
       <section id="articles" class="py-12">
-        <div class="flex items-center justify-between mb-12 animate-slide-up" style="animation-delay: 200ms;">
-          <h2 data-i18n="articles-title" class="text-3xl md:text-4xl font-bold tracking-tight text-white transition-colors duration-300">Artículos Destacados</h2>
+        <div class="flex items-center justify-between mb-12 animate-slide-up" style="animation-delay: 200ms; padding-left: 0; margin-left: 0;">
+          <h2 data-i18n="articles-title" class="text-3xl md:text-4xl font-bold tracking-tight text-white transition-colors duration-300" style="padding-left:0; margin-left:0;">Artículos Destacados</h2>
         </div>
         <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div onclick="abrirArticleModal(0)" role="button" tabindex="0" class="block bg-[#111] rounded-2xl overflow-hidden border border-white/10 shadow-sm hover:shadow-md transition-all duration-300 animate-slide-up group cursor-pointer" style="animation-delay: 200ms;">
@@ -2821,18 +2925,83 @@ document.addEventListener('DOMContentLoaded', () => {
       }).catch(function() {});
     }
 
+    function obtenerContadorVotos() {
+      return parseInt(localStorage.getItem('votos_count') || '0');
+    }
+
+    function mostrarToastVoto(mensaje, esExito) {
+      var toastViejo = document.getElementById('toast-voto');
+      if (toastViejo) toastViejo.remove();
+
+      var toast = document.createElement('div');
+      toast.id = 'toast-voto';
+      toast.style.cssText = [
+        'position:fixed',
+        'bottom:32px',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'z-index:99999',
+        'background:' + (esExito ? 'rgba(15,25,50,0.97)' : 'rgba(50,10,10,0.97)'),
+        'border:1px solid ' + (esExito ? 'rgba(110,200,255,0.3)' : 'rgba(255,80,80,0.3)'),
+        'color:white',
+        "font-family:'Inter',sans-serif",
+        'font-size:14px',
+        'line-height:1.6',
+        'padding:16px 24px',
+        'border-radius:16px',
+        'max-width:380px',
+        'text-align:center',
+        'backdrop-filter:blur(12px)',
+        'box-shadow:0 8px 32px rgba(0,0,0,0.4)',
+        'animation:toastEntrar 0.3s ease'
+      ].join(';');
+      toast.textContent = mensaje;
+      document.body.appendChild(toast);
+
+      setTimeout(function() {
+        toast.style.animation = 'toastSalir 0.3s ease forwards';
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 4000);
+    }
+
+    function registrarVoto(tipo) {
+      var count = obtenerContadorVotos();
+      if (count >= 2) {
+        mostrarToastVoto('Ya usaste tus 2 votos. ¡Gracias por participar!', false);
+        return;
+      }
+      localStorage.setItem('votos_count', count + 1);
+      guardarVotoEnSheet(tipo);
+      if (count === 0) {
+        mostrarToastVoto('¡Gracias por votar! Si cambiás de parecer o querés reforzar tu voto, podés votar de vuelta 1 vez más.', true);
+      } else {
+        mostrarToastVoto('¡Gracias por tu segundo voto! Ya usaste tus 2 votos.', true);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('[id="vote-like"]').forEach(function(el) {
         el.addEventListener('change', function() {
-          if (this.checked) guardarVotoEnSheet('like');
+          if (this.checked) registrarVoto('like');
         });
       });
       document.querySelectorAll('.vote-btn-neutral').forEach(function(btn) {
-        btn.addEventListener('click', function() { guardarVotoEnSheet('neutral'); });
+        btn.addEventListener('click', function() { registrarVoto('neutral'); });
       });
       document.querySelectorAll('.vote-btn-dislike').forEach(function(btn) {
-        btn.addEventListener('click', function() { guardarVotoEnSheet('dislike'); });
+        btn.addEventListener('click', function() { registrarVoto('dislike'); });
       });
+    });
+
+    window.addEventListener('load', function() {
+      if (obtenerContadorVotos() >= 2) {
+        var btns = document.querySelectorAll('.heart-container, .vote-btn-neutral, .vote-btn-dislike');
+        btns.forEach(function(btn) {
+          btn.style.opacity = '0.35';
+          btn.style.pointerEvents = 'none';
+          btn.title = 'Ya usaste tus 2 votos';
+        });
+      }
     });
 
     // ---- POPUP DE BIENVENIDA ----
