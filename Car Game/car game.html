@@ -202,6 +202,42 @@
   </script>
 </head>
 <body>
+  <div id="mobile-block" style="
+    display: none;
+    position: fixed; inset: 0; z-index: 99999;
+    background: #000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    font-family: 'Space Grotesk', sans-serif;
+  ">
+    <div style="font-size: 48px; margin-bottom: 24px;">🖥️</div>
+    <h2 style="color: #fff; font-size: 24px; font-weight: 700; margin-bottom: 12px;">
+      Disponible en desktop
+    </h2>
+    <p style="color: rgba(255,255,255,0.5); font-size: 15px; line-height: 1.6; max-width: 280px;">
+      Este efecto requiere hardware de escritorio para funcionar correctamente. Visitalo desde una computadora.
+    </p>
+    <a href="javascript:history.back()" style="
+      margin-top: 32px;
+      padding: 12px 28px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+    ">← Volver</a>
+  </div>
+  <script>
+    if (/Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent) || window.innerWidth < 768) {
+      document.getElementById('mobile-block').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('DOMContentLoaded', (e) => e.stopImmediatePropagation(), true);
+    }
+  </script>
   <div id="loader" style="
     position: fixed; inset: 0; z-index: 9999;
     background: #000000;
