@@ -698,113 +698,49 @@ gltfLoader.setDRACOLoader(dracoLoader)
 
 function loadModelFromUploaded(name) {
   return new Promise((resolve, reject) => {
-    // Carga directo desde la misma carpeta que este HTML
-    gltfLoader.load(name, resolve, (p) => {
-      if (p.total > 0) setLoading(`Loading ${name}... ${Math.round((p.loaded / p.total) * 100)}%`, 40 + Math.round((p.loaded / p.total) * 25))
-    }, (err) => reject(new Error('No uploaded model: ' + name)))
+    const modelData = window.UPLOADED_3D_MODELS?.find(m => m.name === name)
+    if (!modelData) { reject(new Error('No uploaded model: ' + name)); return }
+    gltfLoader.load(modelData.dataUrl, resolve, (p) => {
+      if (p.total > 0) setLoading(`Loading ${name}… ${Math.round((p.loaded / p.total) * 100)}%`, 40 + Math.round((p.loaded / p.total) * 25))
+    }, reject)
   })
 }
 
 function createFallbackChassis() {
   const group = new THREE.Group()
-  const orange = new THREE.MeshStandardMaterial({ color: '#e8752a', roughness: 0.5, metalness: 0.2 })
-  const darkGray = new THREE.MeshStandardMaterial({ color: '#2a2a2a', roughness: 0.8, metalness: 0.1 })
-  const glass = new THREE.MeshStandardMaterial({ color: '#5ab4cc', roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.55 })
-  const black = new THREE.MeshStandardMaterial({ color: '#111111', roughness: 0.9 })
-  const red = new THREE.MeshStandardMaterial({ color: '#cc2222', roughness: 0.4, metalness: 0.1 })
-  const silver = new THREE.MeshStandardMaterial({ color: '#888888', roughness: 0.3, metalness: 0.7 })
-  // Main body — wide orange SUV base
-  const bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.38, 1.15), orange)
-  bodyMesh.position.set(0, 0.04, 0); bodyMesh.castShadow = true; group.add(bodyMesh)
-  // Lower skirt (wider, darker)
-  const skirt = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.18, 1.28), darkGray)
-  skirt.position.set(0, -0.12, 0); skirt.castShadow = true; group.add(skirt)
-  // Cabin — slightly tapered shape using 3 boxes
-  const cabMain = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.42, 1.0), orange)
-  cabMain.position.set(0.08, 0.42, 0); cabMain.castShadow = true; group.add(cabMain)
-  // Roof
-  const roof = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 0.98), orange)
-  roof.position.set(0.05, 0.65, 0); roof.castShadow = true; group.add(roof)
-  // Windshield front
-  const windF = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.36, 0.92), glass)
-  windF.position.set(0.62, 0.47, 0); group.add(windF)
-  // Rear window
-  const windR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.88), glass)
-  windR.position.set(-0.56, 0.46, 0); group.add(windR)
-  // Side windows x2
-  const winSideGeo = new THREE.BoxGeometry(0.55, 0.26, 0.05)
-  const winSL = new THREE.Mesh(winSideGeo, glass); winSL.position.set(0.05, 0.48, 0.503); group.add(winSL)
-  const winSR = new THREE.Mesh(winSideGeo, glass); winSR.position.set(0.05, 0.48, -0.503); group.add(winSR)
-  // Roof rack
-  const rackBar1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.04, 0.06), silver)
-  rackBar1.position.set(0.15, 0.7, 0.38); group.add(rackBar1)
-  const rackBar2 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.04, 0.06), silver)
-  rackBar2.position.set(0.15, 0.7, -0.38); group.add(rackBar2)
-  const rackCross = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.82), silver)
-  rackCross.position.set(0.25, 0.72, 0); group.add(rackCross)
-  const rackCross2 = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.82), silver)
-  rackCross2.position.set(-0.1, 0.72, 0); group.add(rackCross2)
-  // Jerry can on roof
-  const can = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.18, 0.38), red)
-  can.position.set(0.05, 0.82, 0); can.castShadow = true; group.add(can)
-  // Front bumper
-  const fBumper = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 1.18), darkGray)
-  fBumper.position.set(1.15, -0.06, 0); fBumper.castShadow = true; group.add(fBumper)
-  // Rear bumper
-  const rBumper = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 1.18), darkGray)
-  rBumper.position.set(-1.15, -0.06, 0); rBumper.castShadow = true; group.add(rBumper)
-  // Front grille detail
-  const grille = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.6), black)
-  grille.position.set(1.22, 0.02, 0); group.add(grille)
-  // Headlights
-  const lightGeo = new THREE.BoxGeometry(0.04, 0.1, 0.18)
-  const lightMat = new THREE.MeshStandardMaterial({ color: '#ffffcc', roughness: 0.1, metalness: 0.5, emissive: '#ffffaa', emissiveIntensity: 0.3 })
-  const hlL = new THREE.Mesh(lightGeo, lightMat); hlL.position.set(1.22, 0.1, 0.42); group.add(hlL)
-  const hlR = new THREE.Mesh(lightGeo, lightMat); hlR.position.set(1.22, 0.1, -0.42); group.add(hlR)
-  // Tail lights
-  const tailMat = new THREE.MeshStandardMaterial({ color: '#ff2200', roughness: 0.2, metalness: 0.3, emissive: '#cc1100', emissiveIntensity: 0.4 })
-  const tlL = new THREE.Mesh(lightGeo, tailMat); tlL.position.set(-1.22, 0.1, 0.42); group.add(tlL)
-  const tlR = new THREE.Mesh(lightGeo, tailMat); tlR.position.set(-1.22, 0.1, -0.42); group.add(tlR)
-  // Side mirrors
-  const mirGeo = new THREE.BoxGeometry(0.14, 0.08, 0.04)
-  const mirL = new THREE.Mesh(mirGeo, darkGray); mirL.position.set(0.55, 0.38, 0.59); group.add(mirL)
-  const mirR = new THREE.Mesh(mirGeo, darkGray); mirR.position.set(0.55, 0.38, -0.59); group.add(mirR)
-  // Door lines (subtle dark strips)
-  const doorLineGeo = new THREE.BoxGeometry(1.1, 0.02, 0.02)
-  const dlL = new THREE.Mesh(doorLineGeo, darkGray); dlL.position.set(0.08, 0.22, 0.58); group.add(dlL)
-  const dlR = new THREE.Mesh(doorLineGeo, darkGray); dlR.position.set(0.08, 0.22, -0.58); group.add(dlR)
+  const bodyGeo = new THREE.BoxGeometry(2.4, 0.5, 1.2)
+  const bodyMat = new THREE.MeshStandardMaterial({ color: '#cc3333', roughness: 0.4, metalness: 0.3 })
+  const body = new THREE.Mesh(bodyGeo, bodyMat); body.position.y = 0.05; body.castShadow = true; group.add(body)
+  const cabGeo = new THREE.BoxGeometry(1.2, 0.45, 1.0)
+  const cabMat = new THREE.MeshStandardMaterial({ color: '#882222', roughness: 0.3, metalness: 0.2 })
+  const cab = new THREE.Mesh(cabGeo, cabMat); cab.position.set(0.1, 0.5, 0); cab.castShadow = true; group.add(cab)
+  const windGeo = new THREE.BoxGeometry(0.05, 0.35, 0.85)
+  const windMat = new THREE.MeshStandardMaterial({ color: '#88ccff', roughness: 0.1, metalness: 0.5, transparent: true, opacity: 0.6 })
+  const wind = new THREE.Mesh(windGeo, windMat); wind.position.set(0.62, 0.45, 0); group.add(wind)
+  const bumpGeo = new THREE.BoxGeometry(0.15, 0.25, 1.15)
+  const bumpMat = new THREE.MeshStandardMaterial({ color: '#333333', roughness: 0.7 })
+  const fb = new THREE.Mesh(bumpGeo, bumpMat); fb.position.set(1.25, -0.1, 0); fb.castShadow = true; group.add(fb)
+  const rb = new THREE.Mesh(bumpGeo, bumpMat); rb.position.set(-1.25, -0.1, 0); rb.castShadow = true; group.add(rb)
   return { scene: group }
 }
 
 function createFallbackTire() {
   const group = new THREE.Group()
-  // Tire outer
-  const tireGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.28, 20); tireGeo.rotateX(Math.PI / 2)
-  const tire = new THREE.Mesh(tireGeo, new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.95, metalness: 0.0 }))
+  const tireGeo = new THREE.CylinderGeometry(0.15, 0.15, 0.1, 16); tireGeo.rotateX(Math.PI / 2)
+  const tire = new THREE.Mesh(tireGeo, new THREE.MeshStandardMaterial({ color: '#222222', roughness: 0.9 }))
   tire.castShadow = true; group.add(tire)
-  // Rim
-  const rimGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.29, 12); rimGeo.rotateX(Math.PI / 2)
-  group.add(new THREE.Mesh(rimGeo, new THREE.MeshStandardMaterial({ color: '#666666', roughness: 0.4, metalness: 0.7 })))
-  // Hub cap
-  const hubGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.31, 8); hubGeo.rotateX(Math.PI / 2)
-  group.add(new THREE.Mesh(hubGeo, new THREE.MeshStandardMaterial({ color: '#999999', roughness: 0.2, metalness: 0.9 })))
+  const hubGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.11, 8); hubGeo.rotateX(Math.PI / 2)
+  group.add(new THREE.Mesh(hubGeo, new THREE.MeshStandardMaterial({ color: '#888888', roughness: 0.3, metalness: 0.6 })))
   return { scene: group }
 }
 
 let chassisGltf, tireGltf
 try {
-  chassisGltf = await loadModelFromUploaded('chassis.glb')
-  console.log('chassis.glb loaded')
+  [chassisGltf, tireGltf] = await Promise.all([loadModelFromUploaded('chassis.glb'), loadModelFromUploaded('tire.glb')])
 } catch (e) {
-  console.warn('chassis.glb not found, using procedural fallback:', e.message)
-  chassisGltf = createFallbackChassis()
-}
-try {
-  tireGltf = await loadModelFromUploaded('tire.glb')
-  console.log('tire.glb loaded')
-} catch (e) {
-  console.warn('tire.glb not found, using procedural fallback:', e.message)
-  tireGltf = createFallbackTire()
+  console.warn('Models not found, using procedural fallbacks:', e.message)
+  chassisGltf = chassisGltf || createFallbackChassis()
+  tireGltf = tireGltf || createFallbackTire()
 }
 setLoading('Models loaded', 75)
 
@@ -826,21 +762,14 @@ chassisGroup.add(chassisDebugBox)
 
 const chassisModel = chassisGltf.scene
 chassisModel.rotation.y = Math.PI / 2
-chassisModel.scale.setScalar(0.29)
-chassisModel.position.y = -0.42
+chassisModel.scale.setScalar(3.3)
 chassisModel.traverse((c) => {
   if (c.isMesh) {
-    // Ocultar ruedas del modelo GLB — el juego usa sus propias ruedas físicas
-    const name = (c.name || '').toLowerCase()
-    const parentName = (c.parent && c.parent.name || '').toLowerCase()
-    const isWheel = name.includes('wheel') || name.includes('tire') || name.includes('tyre') ||
-                    name.includes('rueda') || name.includes('rim') || name.includes('pneu') ||
-                    parentName.includes('wheel') || parentName.includes('tire') || parentName.includes('rim')
-    if (isWheel) { c.visible = false; return }
     c.castShadow = true
     c.receiveShadow = true
+    // Ensure no mesh has a default white material
     if (!c.material || (c.material.isMeshStandardMaterial && c.material.color.getHex() === 0xffffff && !c.material.map)) {
-      c.material = new THREE.MeshStandardMaterial({ color: '#111111', roughness: 0.4, metalness: 0.5 })
+      c.material = new THREE.MeshStandardMaterial({ color: '#cc3333', roughness: 0.4, metalness: 0.3 })
     }
   }
 })
@@ -848,8 +777,8 @@ chassisGroup.add(chassisModel)
 scene.add(chassisGroup)
 
 const vehicle = physicsWorld.createVehicleController(chassisBody)
-const WHEEL_R = 0.32, WHEEL_W = 0.22, SUSP_REST = 0.55
-const WHEEL_OFF = { x: 1.05, y: -0.05, z: 0.62 }
+const WHEEL_R = 0.45, WHEEL_W = 0.3, SUSP_REST = 0.6
+const WHEEL_OFF = { x: 1.0, y: 0.1, z: 0.8 }
 const wheelConns = [
   { x: WHEEL_OFF.x, y: WHEEL_OFF.y, z: WHEEL_OFF.z },
   { x: WHEEL_OFF.x, y: WHEEL_OFF.y, z: -WHEEL_OFF.z },
@@ -859,7 +788,7 @@ const wheelConns = [
 const dirCs = { x: 0, y: -1, z: 0 }, axleCs = { x: 0, y: 0, z: 1 }
 const wheelGeo = new THREE.CylinderGeometry(WHEEL_R, WHEEL_R, WHEEL_W, 16)
 wheelGeo.rotateX(Math.PI / 2)
-const wheelDebugMat = new THREE.MeshStandardMaterial({ color: '#222222', transparent: true, opacity: 0.0 })
+const wheelDebugMat = new THREE.MeshStandardMaterial({ color: '#222222', transparent: true, opacity: 0.4 })
 const wheelDebugMeshes = [], wheelMeshes = [], wheelSpins = [0, 0, 0, 0]
 
 for (let i = 0; i < 4; i++) {
@@ -877,7 +806,6 @@ for (let i = 0; i < 4; i++) {
 
   const tc = new THREE.Group()
   const tm = tireGltf.scene.clone()
-  tm.visible = false
   tm.traverse((c) => {
     if (c.isMesh) {
       c.castShadow = true

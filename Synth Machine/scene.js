@@ -1,0 +1,1434 @@
+import * as THREE from 'three/webgpu';
+import { pass, uniform, mrt, output, normalView, vec4, metalness, roughness, mix } from 'three/tsl';
+import { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
+import { ao } from 'three/examples/jsm/tsl/display/GTAONode.js';
+import { ssr } from 'three/examples/jsm/tsl/display/SSRNode.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+
+// 3D Knob Music Machine
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x000000, 0.03);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 6, 10);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGPURenderer({ antialias: true, forceWebGL: !navigator.gpu });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+const root = document.getElementById('root') ?? document.body;
+root.appendChild(renderer.domElement);
+await renderer.init();
+
+// Post processing
+const postProcessing = new THREE.PostProcessing(renderer);
+const scenePass = pass(scene, camera);
+scenePass.setMRT(mrt({
+  output: output,
+  normal: normalView,
+  metalness: metalness,
+  roughness: roughness,
+}));
+
+const scenePassColor = scenePass.getTextureNode('output');
+const scenePassNormal = scenePass.getTextureNode('normal');
+const scenePassDepth = scenePass.getTextureNode('depth');
+const scenePassMetalness = scenePass.getTextureNode('metalness');
+const scenePassRoughness = scenePass.getTextureNode('roughness');
+
+// GTAO Ambient Occlusion — render at half resolution for performance
+const aoPass = ao(scenePassDepth, scenePassNormal, camera);
+aoPass.resolutionScale = 1;
+const aoDistanceExponent = aoPass.distanceExponent ?? null;
+const aoDistanceFallOff = aoPass.distanceFallOff ?? null;
+const aoRadius = aoPass.radius ?? null;
+const aoScale = aoPass.scale ?? null;
+const aoThickness = aoPass.thickness ?? null;
+if (aoDistanceExponent) aoDistanceExponent.value = 1;
+if (aoDistanceFallOff) aoDistanceFallOff.value = 1;
+if (aoRadius) aoRadius.value = 0.5;
+if (aoScale) aoScale.value = 1.2;
+if (aoThickness) aoThickness.value = 2;
+
+// SSR (Screen Space Reflections) — render at half resolution for performance
+const ssrPass = ssr(scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, scenePassRoughness, camera);
+ssrPass.resolutionScale = 0.5;
+const ssrMaxDistance = ssrPass.maxDistance ?? null;
+const ssrThickness = ssrPass.thickness ?? null;
+const ssrMaxRoughness = ssrPass.maxRoughness ?? null;
+if (ssrMaxDistance) ssrMaxDistance.value = 4;
+if (ssrThickness) ssrThickness.value = 0.1;
+if (ssrMaxRoughness) ssrMaxRoughness.value = 0.25;
+
+// Combine: AO * scene color + SSR (with uniform intensity) + bloom
+const aoApplied = vec4(scenePassColor.rgb.mul(aoPass.getTextureNode().r), scenePassColor.a);
+const ssrIntensityUniform = uniform(0.5);
+const ssrBlended = mix(aoApplied, aoApplied.add(ssrPass), ssrIntensityUniform);
+const bloomStrengthUniform = uniform(0.25);
+const bloomPass = bloom(ssrBlended, bloomStrengthUniform, 0.4, 0.95);
+bloomPass.resolutionScale = 0.5;
+postProcessing.outputNode = ssrBlended.add(bloomPass);
+
+// Load HDR environment map
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_09_1k.hdr', (texture) => {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  scene.environment = texture;
+  scene.backgroundBlurriness = 0.7;
+  scene.backgroundIntensity = 0;
+});
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0x111118, 0.4);
+ambientLight.name = 'ambientLight';
+scene.add(ambientLight);
+
+const mainLight = new THREE.DirectionalLight(0xffeedd, 0.70);
+mainLight.name = 'mainLight';
+mainLight.position.set(5, 10, 5);
+mainLight.castShadow = true;
+mainLight.shadow.mapSize.set(1024, 1024);
+mainLight.shadow.bias = -0.001;
+mainLight.shadow.normalBias = 0.02;
+mainLight.shadow.camera.near = 1;
+mainLight.shadow.camera.far = 20;
+mainLight.shadow.camera.left = -6;
+mainLight.shadow.camera.right = 6;
+mainLight.shadow.camera.top = 6;
+mainLight.shadow.camera.bottom = -6;
+scene.add(mainLight);
+
+// Desk lamp — warm focused spotlight from above-front, angled down onto the synth
+const deskLight = new THREE.SpotLight(0xfff0dd, 100.0);
+deskLight.name = 'deskLight';
+deskLight.position.set(0, 7, -3);
+deskLight.target.position.set(0, 0, 0.5);
+deskLight.angle = Math.PI / 6;
+deskLight.penumbra = 0.6;
+deskLight.decay = 1.8;
+deskLight.distance = 18;
+deskLight.castShadow = true;
+deskLight.shadow.mapSize.set(1024, 1024);
+deskLight.shadow.bias = -0.001;
+deskLight.shadow.normalBias = 0.02;
+scene.add(deskLight);
+scene.add(deskLight.target);
+
+// Subtle fill from below-behind so the front face isn't pitch black
+const fillLight = new THREE.SpotLight(0xaabbcc, 3);
+fillLight.name = 'fillLight';
+fillLight.position.set(0, 5, 6);
+fillLight.target.position.set(0, 0, 0);
+fillLight.angle = Math.PI / 5;
+fillLight.penumbra = 0.9;
+fillLight.decay = 2;
+fillLight.distance = 14;
+fillLight.castShadow = false;
+scene.add(fillLight);
+scene.add(fillLight.target);
+
+
+
+// Audio context
+let audioCtx = null;
+let masterGain = null;
+let reverbNode = null;
+let reverbGain = null;
+let delayNode = null;
+let delayGain = null;
+let filterNode = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.3;
+  
+  filterNode = audioCtx.createBiquadFilter();
+  filterNode.type = 'lowpass';
+  filterNode.frequency.value = 8000;
+  filterNode.Q.value = 1;
+  
+  delayNode = audioCtx.createDelay(2.0);
+  delayNode.delayTime.value = 0.3;
+  delayGain = audioCtx.createGain();
+  delayGain.gain.value = 0.0;
+  
+  reverbGain = audioCtx.createGain();
+  reverbGain.gain.value = 0.0;
+  
+  const reverbLength = audioCtx.sampleRate * 2;
+  const impulse = audioCtx.createBuffer(2, reverbLength, audioCtx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = impulse.getChannelData(ch);
+    for (let i = 0; i < reverbLength; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLength, 2.5);
+    }
+  }
+  reverbNode = audioCtx.createConvolver();
+  reverbNode.buffer = impulse;
+  
+  filterNode.connect(masterGain);
+  masterGain.connect(audioCtx.destination);
+  
+  masterGain.connect(delayNode);
+  delayNode.connect(delayGain);
+  delayGain.connect(masterGain);
+  
+  masterGain.connect(reverbGain);
+  reverbGain.connect(reverbNode);
+  reverbNode.connect(audioCtx.destination);
+}
+
+// Scales and notes
+const scales = {
+  pentatonic: [0, 2, 4, 7, 9],
+  minor: [0, 2, 3, 5, 7, 8, 10],
+  major: [0, 2, 4, 5, 7, 9, 11],
+  blues: [0, 3, 5, 6, 7, 10],
+  dorian: [0, 2, 3, 5, 7, 9, 10],
+};
+
+let currentScale = 'pentatonic';
+let baseFreq = 220;
+
+function getFrequency(noteIndex) {
+  const scale = scales[currentScale];
+  const octave = Math.floor(noteIndex / scale.length);
+  const note = scale[noteIndex % scale.length];
+  return baseFreq * Math.pow(2, (note + octave * 12) / 12);
+}
+
+function playNote(freq, duration = 0.3) {
+  if (!audioCtx) return;
+  
+  const waveVal = knobConfigs[8].value;
+  const lowerIndex = Math.floor(waveVal);
+  const upperIndex = Math.min(lowerIndex + 1, 3);
+  const blend = waveVal - lowerIndex;
+  
+  const types = ['sine', 'triangle', 'sawtooth', 'square'];
+  
+  const osc1 = audioCtx.createOscillator();
+  const gain1 = audioCtx.createGain();
+  osc1.type = types[lowerIndex];
+  osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  
+  const osc2 = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  osc2.type = types[upperIndex];
+  osc2.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  
+  const ampBase = 0.15;
+  const amp1 = ampBase * Math.cos(blend * Math.PI * 0.5);
+  const amp2 = ampBase * Math.sin(blend * Math.PI * 0.5);
+  
+  gain1.gain.setValueAtTime(amp1, audioCtx.currentTime);
+  gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  
+  gain2.gain.setValueAtTime(Math.max(amp2, 0.001), audioCtx.currentTime);
+  gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  
+  osc1.connect(gain1);
+  gain1.connect(filterNode);
+  osc2.connect(gain2);
+  gain2.connect(filterNode);
+  
+  osc1.start(audioCtx.currentTime);
+  osc1.stop(audioCtx.currentTime + duration);
+  osc2.start(audioCtx.currentTime);
+  osc2.stop(audioCtx.currentTime + duration);
+}
+
+// Knob data
+const knobConfigs = [
+  { label: 'TEMPO', color: 0xff5555, emissive: 0xff3333, x: -3.2, z: -0.9, min: 60, max: 200, value: 120, row: 0 },
+  { label: 'PITCH', color: 0xffaa55, emissive: 0xff8833, x: -1.6, z: -0.9, min: 110, max: 440, value: 220, row: 0 },
+  { label: 'FILTER', color: 0xffcc44, emissive: 0xffaa22, x: 0, z: -0.9, min: 200, max: 12000, value: 8000, row: 0 },
+  { label: 'REVERB', color: 0x44ff88, emissive: 0x22ff66, x: 1.6, z: -0.9, min: 0, max: 1, value: 0, row: 0 },
+  { label: 'DELAY', color: 0x55aaff, emissive: 0x4488ff, x: 3.2, z: -0.9, min: 0, max: 1, value: 0, row: 0 },
+  { label: 'VOLUME', color: 0xbb66ff, emissive: 0xbb44ff, x: -3.2, z: 0.9, min: 0, max: 1, value: 0.3, row: 1 },
+  { label: 'ATTACK', color: 0xff55bb, emissive: 0xff44aa, x: -1.6, z: 0.9, min: 0.01, max: 1, value: 0.05, row: 1 },
+  { label: 'DECAY', color: 0x44ffff, emissive: 0x22ddff, x: 0, z: 0.9, min: 0.05, max: 2, value: 0.3, row: 1 },
+  { label: 'WAVE', color: 0xff77ff, emissive: 0xff55ee, x: 1.6, z: 0.9, min: 0, max: 3, value: 0, row: 1 },
+  { label: 'SCALE', color: 0x88ff44, emissive: 0x66ff22, x: 3.2, z: 0.9, min: 0, max: 4, value: 0, row: 1 },
+];
+
+const waveTypes = ['sine', 'triangle', 'sawtooth', 'square'];
+const scaleNames = ['pentatonic', 'minor', 'major', 'blues', 'dorian'];
+
+const knobs = [];
+const knobMeshes = [];
+const knobGlowRings = [];
+const knobIndicators = [];
+
+// Shared geometries for instancing
+const sharedGripGeo = new THREE.BoxGeometry(0.01, 0.35, 0.02);
+const sharedGripMat = new THREE.MeshStandardMaterial({
+  color: 0x1c1c24,
+  metalness: 0.3,
+  roughness: 0.85,
+});
+
+// Machine body
+const bodyGroup = new THREE.Group();
+bodyGroup.name = 'bodyGroup';
+scene.add(bodyGroup);
+
+// Main chassis
+const chassisGeo = new THREE.BoxGeometry(9, 0.6, 5.8, 4, 2, 4);
+const chassisMat = new THREE.MeshStandardMaterial({
+  color: 0x1e1e24,
+  metalness: 0.3,
+  roughness: 0.85,
+});
+const chassis = new THREE.Mesh(chassisGeo, chassisMat);
+chassis.name = 'chassis';
+chassis.position.y = -0.3;
+chassis.castShadow = true;
+chassis.receiveShadow = true;
+bodyGroup.add(chassis);
+
+// Top panel
+const panelGeo = new THREE.BoxGeometry(8.6, 0.08, 5.4, 1, 1, 1);
+const panelMat = new THREE.MeshStandardMaterial({
+  color: 0x14141a,
+  metalness: 0.35,
+  roughness: 0.8,
+});
+const panel = new THREE.Mesh(panelGeo, panelMat);
+panel.name = 'panel';
+panel.position.y = 0.04;
+panel.receiveShadow = true;
+bodyGroup.add(panel);
+
+// Edge trim
+const edgeGeo = new THREE.BoxGeometry(9.05, 0.65, 5.85);
+const edgeMat = new THREE.MeshStandardMaterial({
+  color: 0x38383e,
+  metalness: 0.4,
+  roughness: 0.75,
+});
+const edge = new THREE.Mesh(edgeGeo, edgeMat);
+edge.name = 'edgeTrim';
+edge.position.y = -0.3;
+bodyGroup.add(edge);
+
+// Inner panel slightly recessed
+const innerPanelGeo = new THREE.BoxGeometry(8.4, 0.1, 5.2);
+const innerPanelMat = new THREE.MeshStandardMaterial({
+  color: 0x12121a,
+  metalness: 0.25,
+  roughness: 0.85,
+});
+const innerPanel = new THREE.Mesh(innerPanelGeo, innerPanelMat);
+innerPanel.name = 'innerPanel';
+innerPanel.position.y = 0.01;
+bodyGroup.add(innerPanel);
+
+
+
+// Create knobs
+function createKnob(config, index) {
+  const group = new THREE.Group();
+  group.name = `knobGroup_${index}`;
+  group.position.set(config.x, 0.1, config.z);
+  bodyGroup.add(group);
+
+  const baseRingGeo = new THREE.TorusGeometry(0.48, 0.04, 16, 32);
+  const baseRingMat = new THREE.MeshStandardMaterial({
+    color: 0x1a1a22,
+    metalness: 0.35,
+    roughness: 0.8,
+  });
+  const baseRing = new THREE.Mesh(baseRingGeo, baseRingMat);
+  baseRing.name = `knobBaseRing_${index}`;
+  baseRing.rotation.x = -Math.PI / 2;
+  baseRing.position.y = 0.02;
+  group.add(baseRing);
+
+  const glowRingGeo = new THREE.TorusGeometry(0.52, 0.03, 12, 32);
+  const glowRingMat = new THREE.MeshStandardMaterial({
+    color: config.color,
+    emissive: config.emissive,
+    emissiveIntensity: 1.2,
+    metalness: 0.1,
+    roughness: 0.5,
+    transparent: true,
+    opacity: 0.95,
+  });
+  const glowRing = new THREE.Mesh(glowRingGeo, glowRingMat);
+  glowRing.name = `knobGlowRing_${index}`;
+  glowRing.rotation.x = -Math.PI / 2;
+  glowRing.position.y = 0.02;
+  group.add(glowRing);
+  knobGlowRings.push(glowRing);
+
+  const knobGeo = new THREE.CylinderGeometry(0.38, 0.42, 0.45, 32);
+  const knobMat = new THREE.MeshStandardMaterial({
+    color: 0x2a2a32,
+    metalness: 0.3,
+    roughness: 0.8,
+  });
+  const knobMesh = new THREE.Mesh(knobGeo, knobMat);
+  knobMesh.name = `knobBody_${index}`;
+  knobMesh.position.y = 0.3;
+  knobMesh.castShadow = true;
+  group.add(knobMesh);
+
+  const capGeo = new THREE.CylinderGeometry(0.35, 0.38, 0.06, 32);
+  const capMat = new THREE.MeshStandardMaterial({
+    color: 0x3a3a42,
+    metalness: 0.35,
+    roughness: 0.75,
+  });
+  const cap = new THREE.Mesh(capGeo, capMat);
+  cap.name = `knobCap_${index}`;
+  cap.position.y = 0.55;
+  group.add(cap);
+
+  const indicatorGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.07, 8);
+  const indicatorMat = new THREE.MeshStandardMaterial({
+    color: config.color,
+    emissive: config.emissive,
+    emissiveIntensity: 2.0,
+  });
+  const indicator = new THREE.Mesh(indicatorGeo, indicatorMat);
+  indicator.name = `knobIndicator_${index}`;
+  indicator.position.set(0, 0.58, -0.25);
+  group.add(indicator);
+  knobIndicators.push(indicator);
+
+  // Instanced grips - 10 per knob using InstancedMesh
+  const gripCount = 10;
+  const gripInstanced = new THREE.InstancedMesh(sharedGripGeo, sharedGripMat, gripCount);
+  gripInstanced.name = `knobGrips_${index}`;
+  const gripMatrix = new THREE.Matrix4();
+  const gripQuat = new THREE.Quaternion();
+  const gripScale = new THREE.Vector3(1, 1, 1);
+  for (let i = 0; i < gripCount; i++) {
+    const angle = (i / gripCount) * Math.PI * 2;
+    const gPos = new THREE.Vector3(Math.cos(angle) * 0.39, 0.3, Math.sin(angle) * 0.39);
+    gripQuat.setFromEuler(new THREE.Euler(0, -angle, 0));
+    gripMatrix.compose(gPos, gripQuat, gripScale);
+    gripInstanced.setMatrixAt(i, gripMatrix);
+  }
+  gripInstanced.instanceMatrix.needsUpdate = true;
+  group.add(gripInstanced);
+
+  // Removed per-knob point lights for performance — glow rings provide visual feedback
+  const knobLight = null;
+
+  const normalized = (config.value - config.min) / (config.max - config.min);
+  const initAngle = normalized * Math.PI * 2 * 0.75 - Math.PI * 0.75;
+
+  const knobRotGroup = new THREE.Group();
+  knobRotGroup.name = `knobRotGroup_${index}`;
+  knobRotGroup.position.y = 0;
+  group.add(knobRotGroup);
+  
+  group.remove(knobMesh);
+  group.remove(cap);
+  group.remove(indicator);
+  knobRotGroup.add(knobMesh);
+  knobRotGroup.add(cap);
+  knobRotGroup.add(indicator);
+  
+  // Move instanced grips into rotation group
+  group.remove(gripInstanced);
+  knobRotGroup.add(gripInstanced);
+
+  knobRotGroup.rotation.y = initAngle;
+
+  knobMeshes.push(knobMesh);
+  
+  return {
+    group,
+    rotGroup: knobRotGroup,
+    knobMesh,
+    config,
+    normalized,
+    targetNormalized: normalized,
+    glowRing,
+    knobLight: null,
+    index,
+  };
+}
+
+knobConfigs.forEach((config, i) => {
+  knobs.push(createKnob(config, i));
+});
+
+// Sequencer step indicators
+const stepCount = 16;
+const stepLights = [];
+const stepMeshes = [];
+let currentStep = 0;
+let stepPattern = new Array(stepCount).fill(false);
+[0, 2, 4, 5, 7, 8, 10, 12, 14, 15].forEach(i => stepPattern[i] = true);
+
+// Step sequencer — use individual meshes (each needs unique material for color changes)
+// but share geometry
+const sharedStepGeo = new THREE.BoxGeometry(0.35, 0.08, 0.25, 1, 1, 1);
+for (let i = 0; i < stepCount; i++) {
+  const x = (i - (stepCount - 1) / 2) * 0.5;
+  
+  const stepMat = new THREE.MeshStandardMaterial({
+    color: stepPattern[i] ? 0x44ffaa : 0x222233,
+    emissive: stepPattern[i] ? 0x22aa66 : 0x000000,
+    emissiveIntensity: stepPattern[i] ? 0.5 : 0,
+    metalness: 0.5,
+    roughness: 0.4,
+  });
+  const stepMesh = new THREE.Mesh(sharedStepGeo, stepMat);
+  stepMesh.name = `step_${i}`;
+  stepMesh.position.set(x, 0.08, 2.3);
+  stepMesh.userData = { stepIndex: i, lastState: -1 };
+  bodyGroup.add(stepMesh);
+  stepMeshes.push(stepMesh);
+
+  stepLights.push(null);
+}
+
+// Controls panel (play button + VU meters)
+const controlsPanelGeo = new THREE.BoxGeometry(4.5, 0.12, 1.4, 1, 1, 1);
+const controlsPanelMat = new THREE.MeshStandardMaterial({
+  color: 0x10101a,
+  metalness: 0.25,
+  roughness: 0.85,
+});
+const controlsPanel = new THREE.Mesh(controlsPanelGeo, controlsPanelMat);
+controlsPanel.name = 'controlsPanel';
+controlsPanel.position.set(0, -0.44, 4.25);
+controlsPanel.renderOrder = 2;
+controlsPanel.receiveShadow = true;
+bodyGroup.add(controlsPanel);
+
+const controlsPanelEdgeGeo = new THREE.BoxGeometry(4.55, 0.14, 1.45);
+const controlsPanelEdgeMat = new THREE.MeshStandardMaterial({
+  color: 0x2e2e38,
+  metalness: 0.3,
+  roughness: 0.8,
+});
+const controlsPanelEdge = new THREE.Mesh(controlsPanelEdgeGeo, controlsPanelEdgeMat);
+controlsPanelEdge.name = 'controlsPanelEdge';
+controlsPanelEdge.position.set(0, -0.46, 4.25);
+controlsPanelEdge.renderOrder = 1;
+bodyGroup.add(controlsPanelEdge);
+
+const controlsPanelTrimGeo = new THREE.BoxGeometry(4.3, 0.02, 1.2);
+const controlsPanelTrimMat = new THREE.MeshStandardMaterial({
+  color: 0x0e0e16,
+  metalness: 0.2,
+  roughness: 0.85,
+});
+const controlsPanelTrim = new THREE.Mesh(controlsPanelTrimGeo, controlsPanelTrimMat);
+controlsPanelTrim.name = 'controlsPanelTrim';
+controlsPanelTrim.position.set(0, -0.365, 4.25);
+controlsPanelTrim.renderOrder = 3;
+controlsPanelTrim.receiveShadow = true;
+bodyGroup.add(controlsPanelTrim);
+
+// Controls panel label
+const ctrlLabel = createLabel('TRANSPORT', -1.2, -0.35, 3.7, 18, '#445566');
+ctrlLabel.name = 'controlsPanelLabel';
+ctrlLabel.scale.set(0.6, 0.6, 0.6);
+bodyGroup.add(ctrlLabel);
+
+const vuLabel = createLabel('LEVELS', 0.8, -0.35, 3.7, 18, '#445566');
+vuLabel.name = 'vuLabel';
+vuLabel.scale.set(0.6, 0.6, 0.6);
+bodyGroup.add(vuLabel);
+
+// Play/Stop button
+const playBtnGeo = new THREE.CylinderGeometry(0.3, 0.32, 0.25, 32);
+const playBtnMat = new THREE.MeshStandardMaterial({
+  color: 0x44ff66,
+  emissive: 0x22aa44,
+  emissiveIntensity: 0.5,
+  metalness: 0.2,
+  roughness: 0.6,
+});
+const playBtn = new THREE.Mesh(playBtnGeo, playBtnMat);
+playBtn.name = 'playBtn';
+playBtn.position.set(-1.55, -0.25, 4.25);
+playBtn.castShadow = true;
+bodyGroup.add(playBtn);
+
+const triShape = new THREE.Shape();
+triShape.moveTo(-0.08, -0.1);
+triShape.lineTo(-0.08, 0.1);
+triShape.lineTo(0.1, 0);
+triShape.closePath();
+const triGeo = new THREE.ExtrudeGeometry(triShape, { depth: 0.02, bevelEnabled: false });
+const triMat = new THREE.MeshStandardMaterial({ color: 0x115522, emissive: 0x000000, metalness: 0.5, roughness: 0.5 });
+const triMesh = new THREE.Mesh(triGeo, triMat);
+triMesh.name = 'playIcon';
+triMesh.rotation.x = -Math.PI / 2;
+triMesh.position.set(-1.55, -0.14, 4.27);
+bodyGroup.add(triMesh);
+
+// Reset button
+const resetBtnGeo = new THREE.CylinderGeometry(0.22, 0.24, 0.25, 32);
+const resetBtnMat = new THREE.MeshStandardMaterial({
+  color: 0x5588aa,
+  emissive: 0x224466,
+  emissiveIntensity: 0.5,
+  metalness: 0.2,
+  roughness: 0.6,
+});
+const resetBtn = new THREE.Mesh(resetBtnGeo, resetBtnMat);
+resetBtn.name = 'resetBtn';
+resetBtn.position.set(-0.8, -0.25, 4.25);
+resetBtn.castShadow = true;
+bodyGroup.add(resetBtn);
+
+// Reset icon (circular arrow shape)
+const resetIconGroup = new THREE.Group();
+resetIconGroup.name = 'resetIconGroup';
+resetIconGroup.position.set(-0.8, -0.12, 4.25);
+bodyGroup.add(resetIconGroup);
+
+// Build arc as a tube following a circular path
+const arcMat = new THREE.MeshStandardMaterial({ color: 0x1a3344, metalness: 0.5, roughness: 0.5 });
+
+const arcRadius = 0.09;
+const arcStartAngle = Math.PI * 0.2;
+const arcEndAngle = Math.PI * 1.8;
+const arcSegments = 32;
+const arcPathPoints = [];
+for (let i = 0; i <= arcSegments; i++) {
+  const angle = arcStartAngle + (arcEndAngle - arcStartAngle) * (i / arcSegments);
+  arcPathPoints.push(new THREE.Vector3(Math.cos(angle) * arcRadius, 0, Math.sin(angle) * arcRadius));
+}
+const arcCurvePath = new THREE.CatmullRomCurve3(arcPathPoints, false);
+const arcTubeGeo = new THREE.TubeGeometry(arcCurvePath, 24, 0.015, 6, false);
+const arcMesh = new THREE.Mesh(arcTubeGeo, arcMat);
+arcMesh.name = 'resetArc';
+resetIconGroup.add(arcMesh);
+
+// Arrowhead at the end of the arc
+const arrowHeadSize = 0.045;
+const arrowShape = new THREE.Shape();
+arrowShape.moveTo(0, arrowHeadSize);
+arrowShape.lineTo(-arrowHeadSize * 0.7, -arrowHeadSize * 0.3);
+arrowShape.lineTo(arrowHeadSize * 0.7, -arrowHeadSize * 0.3);
+arrowShape.closePath();
+const arrowGeo = new THREE.ExtrudeGeometry(arrowShape, { depth: 0.025, bevelEnabled: false });
+const arrowMesh = new THREE.Mesh(arrowGeo, arcMat);
+arrowMesh.name = 'resetArrow';
+
+// Position at the end of the arc, pointing tangentially
+const endAngle = arcEndAngle;
+const arrowX = Math.cos(endAngle) * arcRadius;
+const arrowZ = Math.sin(endAngle) * arcRadius;
+arrowMesh.position.set(arrowX, -0.0125, arrowZ);
+arrowMesh.rotation.x = -Math.PI / 2;
+// Rotate so the arrowhead points along the tangent (clockwise direction)
+arrowMesh.rotation.z = -endAngle + Math.PI * 0.5;
+resetIconGroup.add(arrowMesh);
+
+let resetPressed = false;
+let resetPressTime = 0;
+
+let isPlaying = false;
+let lastStepTime = 0;
+
+// Button labels
+const playLabel = createLabel('PLAY', -1.55, -0.35, 3.8, 18, '#44ff66');
+playLabel.name = 'playBtnLabel';
+playLabel.scale.set(0.5, 0.5, 0.5);
+bodyGroup.add(playLabel);
+
+const resetLabel = createLabel('RESET', -0.8, -0.35, 3.8, 18, '#5588aa');
+resetLabel.name = 'resetBtnLabel';
+resetLabel.scale.set(0.5, 0.5, 0.5);
+bodyGroup.add(resetLabel);
+
+// Text labels via canvas
+function createLabel(text, x, y, z, size, color) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 256;
+  canvas.height = 64;
+  ctx.clearRect(0, 0, 256, 64);
+  ctx.font = `bold ${size}px Inter, Arial, sans-serif`;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 128, 32);
+  
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.premultiplyAlpha = true;
+  
+  const geo = new THREE.PlaneGeometry(1.2, 0.3);
+  const mat = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    alphaTest: 0.01,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(x, y, z);
+  return mesh;
+}
+
+knobConfigs.forEach((config, i) => {
+  const label = createLabel(config.label, config.x, 0.09, config.z + 0.75, 28, '#' + config.color.toString(16).padStart(6, '0'));
+  label.name = `knobLabel_${i}`;
+  bodyGroup.add(label);
+});
+
+const brandCanvas = document.createElement('canvas');
+const brandCtx = brandCanvas.getContext('2d');
+brandCanvas.width = 512;
+brandCanvas.height = 64;
+brandCtx.font = 'bold 36px Inter, Arial, sans-serif';
+brandCtx.fillStyle = '#667788';
+brandCtx.textAlign = 'center';
+brandCtx.textBaseline = 'middle';
+brandCtx.fillText('SYNTH · MACHINE · MK3', 256, 32);
+const brandTexture = new THREE.CanvasTexture(brandCanvas);
+const brandGeo = new THREE.PlaneGeometry(4, 0.3);
+const brandMat = new THREE.MeshBasicMaterial({ map: brandTexture, transparent: true });
+const brandMesh = new THREE.Mesh(brandGeo, brandMat);
+brandMesh.name = 'brandLabel';
+brandMesh.rotation.x = -Math.PI / 2;
+brandMesh.position.set(0, 0.09, -2.0);
+bodyGroup.add(brandMesh);
+
+// Floor
+const floorGeo = new THREE.PlaneGeometry(500, 500);
+const floorMat = new THREE.MeshStandardMaterial({
+  color: 0x030305,
+  metalness: 0.2,
+  roughness: 0.9,
+});
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.name = 'floor';
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -0.6;
+floor.receiveShadow = true;
+scene.add(floor);
+
+const seqLabel = createLabel('SEQUENCER', 0, 0.09, 2.8, 22, '#556677');
+seqLabel.name = 'seqLabel';
+seqLabel.scale.set(0.8, 0.8, 0.8);
+bodyGroup.add(seqLabel);
+
+// Scene settings panel
+const settingsPanel = document.createElement('div');
+settingsPanel.style.cssText = `
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: rgba(10, 10, 15, 0.92);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  color: #aab;
+  font-size: 11px;
+  z-index: 100;
+  backdrop-filter: blur(14px);
+  user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  display: none;
+`;
+
+const panelHeader = document.createElement('div');
+panelHeader.style.cssText = `
+  padding: 12px 14px 8px;
+  color: #99a;
+  font-size: 10px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+panelHeader.innerHTML = `SCENE SETTINGS <span id="panelToggle" style="color:#778;font-size:14px;">▾</span>`;
+settingsPanel.appendChild(panelHeader);
+
+const panelBody = document.createElement('div');
+panelBody.style.cssText = `padding: 6px 0;`;
+settingsPanel.appendChild(panelBody);
+
+let panelOpen = true;
+panelHeader.addEventListener('click', () => {
+  panelOpen = !panelOpen;
+  panelBody.style.display = panelOpen ? 'block' : 'none';
+  document.getElementById('panelToggle').textContent = panelOpen ? '▾' : '▸';
+});
+
+function createSection(title) {
+  const sec = document.createElement('div');
+  sec.style.cssText = `padding: 8px 14px 4px; color: #99a; font-size: 9px; letter-spacing: 1.5px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.04);`;
+  sec.textContent = title;
+  panelBody.appendChild(sec);
+  return sec;
+}
+
+function createSlider(label, min, max, value, step, onChange, colorHint) {
+  const row = document.createElement('div');
+  row.style.cssText = `padding: 4px 14px; display: flex; align-items: center; gap: 6px;`;
+  
+  const lbl = document.createElement('span');
+  lbl.style.cssText = `flex: 0 0 80px; color: ${colorHint || '#ccd'}; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`;
+  lbl.textContent = label;
+  
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = min;
+  slider.max = max;
+  slider.step = step;
+  slider.value = value;
+  slider.style.cssText = `
+    flex: 1;
+    min-width: 0;
+    height: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    accent-color: ${colorHint || '#668'};
+  `;
+  
+  const val = document.createElement('span');
+  val.style.cssText = `flex: 0 0 40px; text-align: right; color: #eef; font-size: 10px; font-family: monospace; white-space: nowrap;`;
+  val.textContent = Number(value).toFixed(step < 0.1 ? 2 : step < 1 ? 1 : 0);
+  
+  slider.addEventListener('input', () => {
+    const v = parseFloat(slider.value);
+    val.textContent = v.toFixed(step < 0.1 ? 2 : step < 1 ? 1 : 0);
+    onChange(v);
+  });
+  
+  row.appendChild(lbl);
+  row.appendChild(slider);
+  row.appendChild(val);
+  panelBody.appendChild(row);
+  return slider;
+}
+
+function createColorPicker(label, hexValue, onChange, colorHint) {
+  const row = document.createElement('div');
+  row.style.cssText = `padding: 4px 14px; display: flex; align-items: center; gap: 6px;`;
+  
+  const lbl = document.createElement('span');
+  lbl.style.cssText = `flex: 0 0 80px; color: ${colorHint || '#889'}; font-size: 10px; white-space: nowrap;`;
+  lbl.textContent = label;
+  
+  const picker = document.createElement('input');
+  picker.type = 'color';
+  picker.value = '#' + hexValue.toString(16).padStart(6, '0');
+  picker.style.cssText = `
+    flex: 0 0 28px; width: 28px; height: 18px; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px; background: transparent; cursor: pointer; padding: 0;
+  `;
+  
+  const hexLabel = document.createElement('span');
+  hexLabel.style.cssText = `flex: 1; color: #eef; font-size: 10px; font-family: monospace;`;
+  hexLabel.textContent = picker.value;
+  
+  picker.addEventListener('input', () => {
+    hexLabel.textContent = picker.value;
+    onChange(parseInt(picker.value.slice(1), 16));
+  });
+  
+  row.appendChild(lbl);
+  row.appendChild(picker);
+  row.appendChild(hexLabel);
+  panelBody.appendChild(row);
+  return picker;
+}
+
+// --- Chassis ---
+createSection('CHASSIS');
+createSlider('Metalness', 0, 1, 0.3, 0.01, v => chassisMat.metalness = v, '#8af');
+createSlider('Roughness', 0, 1, 0.85, 0.01, v => chassisMat.roughness = v, '#8af');
+createColorPicker('Color', 0x1e1e24, v => chassisMat.color.setHex(v), '#8af');
+
+// --- Top Panel ---
+createSection('TOP PANEL');
+createSlider('Metalness', 0, 1, 0.35, 0.01, v => panelMat.metalness = v, '#a8f');
+createSlider('Roughness', 0, 1, 0.8, 0.01, v => panelMat.roughness = v, '#a8f');
+createColorPicker('Color', 0x14141a, v => panelMat.color.setHex(v), '#a8f');
+
+// --- Edge Trim ---
+createSection('EDGE TRIM');
+createSlider('Metalness', 0, 1, 0.4, 0.01, v => edgeMat.metalness = v, '#fa8');
+createSlider('Roughness', 0, 1, 0.75, 0.01, v => edgeMat.roughness = v, '#fa8');
+createColorPicker('Color', 0x38383e, v => edgeMat.color.setHex(v), '#fa8');
+
+// --- Knob Bodies ---
+const knobBodyMat = knobs[0].knobMesh.material;
+createSection('KNOB BODIES');
+createSlider('Metalness', 0, 1, 0.3, 0.01, v => {
+  knobs.forEach(k => k.knobMesh.material.metalness = v);
+}, '#f8a');
+createSlider('Roughness', 0, 1, 0.8, 0.01, v => {
+  knobs.forEach(k => k.knobMesh.material.roughness = v);
+}, '#f8a');
+createColorPicker('Color', 0x2a2a32, v => {
+  knobs.forEach(k => k.knobMesh.material.color.setHex(v));
+}, '#f8a');
+
+// --- Lighting ---
+createSection('LIGHTING');
+createSlider('Ambient', 0, 4, 0.4, 0.05, v => ambientLight.intensity = v, '#ff8');
+createSlider('Main Light', 0, 6, 0.70, 0.05, v => mainLight.intensity = v, '#ff8');
+createSlider('Desk Light', 0, 200, 100.0, 0.5, v => deskLight.intensity = v, '#ff8');
+createSlider('Fill Light', 0, 20, 3, 0.1, v => fillLight.intensity = v, '#ff8');
+
+
+
+// --- Environment ---
+createSection('ENVIRONMENT');
+createSlider('Exposure', 0.2, 4, 1.2, 0.05, v => renderer.toneMappingExposure = v, '#8ff');
+createSlider('BG Blur', 0, 1, scene.backgroundBlurriness ?? 0.7, 0.01, v => scene.backgroundBlurriness = v, '#8ff');
+createSlider('BG Intensity', 0, 2, scene.backgroundIntensity ?? 0.015, 0.01, v => scene.backgroundIntensity = v, '#8ff');
+createSlider('Env Intensity', 0, 4, scene.environmentIntensity ?? 1, 0.05, v => scene.environmentIntensity = v, '#8ff');
+
+// --- Ambient Occlusion ---
+createSection('AMBIENT OCCLUSION');
+createSlider('AO Radius', 0.05, 2, 0.5, 0.01, v => { if (aoRadius) aoRadius.value = v; }, '#adf');
+createSlider('AO Scale', 0.5, 5, 1.2, 0.1, v => { if (aoScale) aoScale.value = v; }, '#adf');
+createSlider('AO Thickness', 0.5, 5, 2, 0.1, v => { if (aoThickness) aoThickness.value = v; }, '#adf');
+createSlider('AO DistFalloff', 0.1, 3, 1, 0.05, v => { if (aoDistanceFallOff) aoDistanceFallOff.value = v; }, '#adf');
+createSlider('AO DistExp', 0.5, 4, 1, 0.1, v => { if (aoDistanceExponent) aoDistanceExponent.value = v; }, '#adf');
+
+// --- SSR ---
+createSection('SSR');
+createSlider('Intensity', 0, 2, 0.5, 0.01, v => { ssrIntensityUniform.value = v; }, '#8df');
+createSlider('Max Dist', 0.5, 20, 6, 0.1, v => { if (ssrMaxDistance) ssrMaxDistance.value = v; }, '#8df');
+createSlider('Thickness', 0.01, 1, 0.1, 0.01, v => { if (ssrThickness) ssrThickness.value = v; }, '#8df');
+createSlider('Max Rough', 0, 1, 0.3, 0.01, v => { if (ssrMaxRoughness) ssrMaxRoughness.value = v; }, '#8df');
+
+// --- Bloom ---
+createSection('BLOOM');
+createSlider('Strength', 0, 2, 0.25, 0.01, v => {
+  bloomStrengthUniform.value = v;
+}, '#f8f');
+
+document.body.appendChild(settingsPanel);
+
+// Toggle settings panel with 'S' key, FPS with 'F' key
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 's' || e.key === 'S') {
+    settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+  }
+  if (e.key === 'f' || e.key === 'F') {
+    fpsDiv.style.display = fpsDiv.style.display === 'none' ? 'block' : 'none';
+  }
+});
+
+// Orbit controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI / 2.1;
+controls.minDistance = 5;
+controls.maxDistance = 18;
+controls.target.set(0, 0, 0);
+
+// Raycaster for interaction
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let isDraggingKnob = false;
+let activeKnob = null;
+let dragStartY = 0;
+let dragStartNormalized = 0;
+
+function getClickableObjects() {
+  const objs = [...stepMeshes, playBtn, resetBtn];
+  knobs.forEach(k => {
+    k.rotGroup.traverse(child => {
+      if (child.isMesh) objs.push(child);
+    });
+  });
+  return objs;
+}
+
+function findKnobByChild(mesh) {
+  for (const knob of knobs) {
+    let found = false;
+    knob.rotGroup.traverse(child => {
+      if (child === mesh) found = true;
+    });
+    if (found) return knob;
+  }
+  return null;
+}
+
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  initAudio();
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(getClickableObjects(), false);
+  
+  if (intersects.length > 0) {
+    const hit = intersects[0].object;
+    
+    if (hit.userData.stepIndex !== undefined) {
+      const idx = hit.userData.stepIndex;
+      stepPattern[idx] = !stepPattern[idx];
+      hit.material.color.setHex(stepPattern[idx] ? 0x44ffaa : 0x222233);
+      hit.material.emissive.setHex(stepPattern[idx] ? 0x22aa66 : 0x000000);
+      hit.material.emissiveIntensity = stepPattern[idx] ? 0.5 : 0;
+      return;
+    }
+    
+    if (hit === playBtn) {
+      isPlaying = !isPlaying;
+      playBtnMat.color.setHex(isPlaying ? 0xff4444 : 0x44ff66);
+      playBtnMat.emissive.setHex(isPlaying ? 0xaa2222 : 0x22aa44);
+      triMat.color.setHex(isPlaying ? 0x661111 : 0x115522);
+      triMat.emissive.setHex(isPlaying ? 0x440808 : 0x000000);
+      const pressedY = -0.35;
+      const releasedY = -0.25;
+      playBtn.position.y = isPlaying ? pressedY : releasedY;
+      triMesh.position.y = isPlaying ? pressedY + 0.11 : releasedY + 0.11;
+      playBtn.position.x = -1.55;
+      triMesh.position.x = -1.55;
+      if (isPlaying) {
+        currentStep = 0;
+        lastStepTime = performance.now();
+      }
+      return;
+    }
+    
+    if (hit === resetBtn) {
+      // Stop playback
+      isPlaying = false;
+      playBtnMat.color.setHex(0x44ff66);
+      playBtnMat.emissive.setHex(0x22aa44);
+      playBtn.position.y = -0.25;
+      triMesh.position.y = -0.25 + 0.11;
+      
+      triMat.color.setHex(0x115522);
+      triMat.emissive.setHex(0x000000);
+      
+      // Reset sequencer
+      currentStep = 0;
+      lastStepTime = 0;
+      
+      // Reset step visuals
+      stepMeshes.forEach((mesh, i) => {
+        mesh.position.y = 0.08;
+        if (stepPattern[i]) {
+          mesh.material.emissive.setHex(0x22aa66);
+          mesh.material.emissiveIntensity = 0.5;
+        }
+      });
+      
+      // Reset knobs to defaults
+      knobConfigs.forEach((cfg, i) => {
+        const defaults = [120, 220, 8000, 0, 0, 0.3, 0.05, 0.3, 0, 0];
+        cfg.value = defaults[i];
+        const knob = knobs[i];
+        knob.normalized = (cfg.value - cfg.min) / (cfg.max - cfg.min);
+        knob.targetNormalized = knob.normalized;
+        const angle = knob.normalized * Math.PI * 2 * 0.75 - Math.PI * 0.75;
+        knob.rotGroup.rotation.y = angle;
+        applyKnobValue(knob);
+      });
+      
+      // Reset VU meters
+      vuDecay.fill(0);
+      
+      // Tactile press animation
+      resetPressed = true;
+      resetPressTime = performance.now();
+      resetBtn.position.y = -0.35;
+      resetBtn.position.x = -0.8;
+      resetIconGroup.position.y = -0.22;
+      resetIconGroup.position.x = -0.8;
+      
+      return;
+    }
+    
+    const knob = findKnobByChild(hit);
+    if (knob) {
+      isDraggingKnob = true;
+      activeKnob = knob;
+      dragStartY = e.clientY;
+      dragStartNormalized = knob.normalized;
+      controls.enabled = false;
+    }
+  }
+});
+
+renderer.domElement.addEventListener('pointermove', (e) => {
+  if (isDraggingKnob && activeKnob) {
+    const deltaY = (dragStartY - e.clientY) / 200;
+    let newNorm = Math.max(0, Math.min(1, dragStartNormalized + deltaY));
+    activeKnob.normalized = newNorm;
+    activeKnob.targetNormalized = newNorm;
+    
+    const angle = newNorm * Math.PI * 2 * 0.75 - Math.PI * 0.75;
+    activeKnob.rotGroup.rotation.y = angle;
+    
+    const cfg = activeKnob.config;
+    cfg.value = cfg.min + newNorm * (cfg.max - cfg.min);
+    
+    applyKnobValue(activeKnob);
+  }
+});
+
+renderer.domElement.addEventListener('pointerup', () => {
+  isDraggingKnob = false;
+  activeKnob = null;
+  controls.enabled = true;
+});
+
+function applyKnobValue(knob) {
+  const cfg = knob.config;
+  const val = cfg.value;
+  
+  switch (cfg.label) {
+    case 'VOLUME':
+      if (masterGain) masterGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+      break;
+    case 'FILTER':
+      if (filterNode) filterNode.frequency.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+      break;
+    case 'REVERB':
+      if (reverbGain) reverbGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+      break;
+    case 'DELAY':
+      if (delayGain) delayGain.gain.setTargetAtTime(val * 0.6, audioCtx.currentTime, 0.05);
+      break;
+    case 'PITCH':
+      baseFreq = val;
+      break;
+    case 'WAVE':
+      break;
+    case 'SCALE':
+      currentScale = scaleNames[Math.round(val)];
+      break;
+  }
+}
+
+// Sequencer helpers
+function getStepInterval() {
+  const tempo = knobConfigs[0].value;
+  return 60000 / tempo / 4;
+}
+
+function getCurrentWaveType() {
+  const waveVal = Math.round(knobConfigs[8].value);
+  return waveTypes[Math.min(waveVal, 3)];
+}
+
+function getDecay() {
+  return knobConfigs[7].value;
+}
+
+// VU meter bars
+// VU meter bars — share geometry, individual materials for per-bar color/emissive
+const vuBars = [];
+const vuCount = 8;
+const sharedVuGeo = new THREE.BoxGeometry(0.12, 0.4, 0.12);
+for (let i = 0; i < vuCount; i++) {
+  const barMat = new THREE.MeshStandardMaterial({
+    color: i < 5 ? 0x44ff66 : (i < 7 ? 0xffaa44 : 0xff4444),
+    emissive: i < 5 ? 0x22aa44 : (i < 7 ? 0xaa6622 : 0xaa2222),
+    emissiveIntensity: 0.3,
+    metalness: 0.5,
+    roughness: 0.4,
+  });
+  const bar = new THREE.Mesh(sharedVuGeo, barMat);
+  bar.name = `vuBar_${i}`;
+  bar.position.set(0.2 + i * 0.18, -0.25, 4.25);
+  bar.scale.y = 0.1;
+  bodyGroup.add(bar);
+  vuBars.push(bar);
+}
+
+// UI Overlay
+const uiDiv = document.createElement('div');
+uiDiv.style.cssText = `
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: rgba(8, 8, 12, 0.92);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  color: #889;
+  font-size: 12px;
+  z-index: 100;
+  box-sizing: border-box;
+  backdrop-filter: blur(14px);
+  user-select: none;
+`;
+uiDiv.innerHTML = `
+  <div style="display:flex; align-items:baseline; gap:8px;">
+    <span style="font-family:'Instrument Serif',serif; font-size:16px; color:#ccd; letter-spacing:0.5px;">Synth Machine</span>
+    <span style="font-family:'Instrument Sans',sans-serif; font-size:10px; color:#556; letter-spacing:2px; text-transform:uppercase;">MK3</span>
+  </div>
+  <div style="display:flex; gap:16px; align-items:center; font-size:11px; color:#667;">
+    <span>Drag knobs to adjust</span>
+    <span style="color:#334;">·</span>
+    <span>Click steps to toggle</span>
+    <span style="color:#334;">·</span>
+    <span style="color:#4f8;">▶ Play to start</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border:1px solid rgba(255,255,255,0.12); border-radius:4px; font-family:'Instrument Sans',sans-serif; font-size:10px; color:#99a; font-weight:600;">S</span>
+    <span style="font-size:10px; color:#556;">Settings</span>
+    <span style="color:#334; margin:0 4px;">·</span>
+    <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border:1px solid rgba(255,255,255,0.12); border-radius:4px; font-family:'Instrument Sans',sans-serif; font-size:10px; color:#99a; font-weight:600;">F</span>
+    <span style="font-size:10px; color:#556;">FPS</span>
+  </div>
+`;
+document.body.appendChild(uiDiv);
+
+// FPS counter
+const fpsDiv = document.createElement('div');
+fpsDiv.style.cssText = `
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 8px 12px;
+  background: rgba(8, 8, 12, 0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  color: #4f8;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  z-index: 100;
+  backdrop-filter: blur(14px);
+  user-select: none;
+`;
+fpsDiv.textContent = '-- FPS';
+fpsDiv.style.display = 'none';
+document.body.appendChild(fpsDiv);
+
+let fpsFrames = 0;
+let fpsLastTime = performance.now();
+
+// Info display
+const infoDiv = document.createElement('div');
+infoDiv.style.cssText = `
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 18px 22px;
+  background: rgba(8, 8, 12, 0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  color: #778;
+  font-size: 12px;
+  line-height: 2;
+  z-index: 100;
+  box-sizing: border-box;
+  backdrop-filter: blur(14px);
+  min-width: 170px;
+`;
+document.body.appendChild(infoDiv);
+
+function updateInfoDisplay() {
+  const tempo = Math.round(knobConfigs[0].value);
+  const pitch = Math.round(knobConfigs[1].value);
+  const filter = Math.round(knobConfigs[2].value);
+  const wave = getCurrentWaveType();
+  const scale = currentScale;
+  infoDiv.innerHTML = `
+    <div style="font-family:'Instrument Sans',sans-serif; font-size:9px; letter-spacing:2.5px; color:#556; text-transform:uppercase; margin-bottom:8px;">Parameters</div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;"><span style="font-family:'Instrument Sans',sans-serif; font-size:10px; color:#f55; letter-spacing:1px;">BPM</span><span style="font-family:'Instrument Serif',serif; font-size:15px; color:#dde;">${tempo}</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;"><span style="font-family:'Instrument Sans',sans-serif; font-size:10px; color:#fa6; letter-spacing:1px;">PITCH</span><span style="font-family:'Instrument Serif',serif; font-size:15px; color:#dde;">${pitch}<span style="font-family:'Instrument Sans',sans-serif; font-size:9px; color:#667; margin-left:2px;">Hz</span></span></div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;"><span style="font-family:'Instrument Sans',sans-serif; font-size:10px; color:#fc4; letter-spacing:1px;">FILT</span><span style="font-family:'Instrument Serif',serif; font-size:15px; color:#dde;">${filter}<span style="font-family:'Instrument Sans',sans-serif; font-size:9px; color:#667; margin-left:2px;">Hz</span></span></div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;"><span style="font-family:'Instrument Sans',sans-serif; font-size:10px; color:#f6f; letter-spacing:1px;">WAVE</span><span style="font-family:'Instrument Serif',serif; font-size:14px; color:#dde; font-style:italic;">${wave}</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;"><span style="font-family:'Instrument Sans',sans-serif; font-size:10px; color:#8f4; letter-spacing:1px;">SCALE</span><span style="font-family:'Instrument Serif',serif; font-size:14px; color:#dde; font-style:italic;">${scale}</span></div>
+    <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:6px;">
+      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${isPlaying ? '#4f8' : '#f44'};"></span>
+      <span style="font-family:'Instrument Sans',sans-serif; font-size:10px; letter-spacing:1.5px; color:${isPlaying ? '#4f8' : '#f44'};">${isPlaying ? 'PLAYING' : 'STOPPED'}</span>
+    </div>
+  `;
+}
+
+// Animate
+const clock = new THREE.Clock();
+let vuDecay = new Array(vuCount).fill(0);
+
+function animate() {
+  const time = clock.getElapsedTime();
+  const now = performance.now();
+  
+  controls.update();
+  
+  // Sequencer
+  if (isPlaying) {
+    const interval = getStepInterval();
+    if (now - lastStepTime >= interval) {
+      lastStepTime = now;
+      
+      currentStep = (currentStep + 1) % stepCount;
+      
+      if (stepPattern[currentStep]) {
+        const noteIndex = currentStep % 8;
+        const freq = getFrequency(noteIndex);
+        const decay = getDecay();
+        const wave = getCurrentWaveType();
+        playNote(freq, decay, wave);
+        
+        for (let i = 0; i < vuCount; i++) {
+          vuDecay[i] = Math.max(vuDecay[i], (vuCount - i) / vuCount * (0.7 + Math.random() * 0.3));
+        }
+      }
+    }
+  }
+  
+  // Animate step meshes — only update materials when state changes
+  for (let i = 0; i < stepCount; i++) {
+    const mesh = stepMeshes[i];
+    const isActive = i === currentStep && isPlaying;
+    let state;
+    if (isActive && stepPattern[i]) state = 3;
+    else if (isActive) state = 2;
+    else if (stepPattern[i]) state = 1;
+    else state = 0;
+
+    if (state === 3) {
+      // Active + ON: always update for pulse
+      mesh.position.y = 0.08 + Math.sin(time * 10) * 0.02;
+      if (mesh.userData.lastState !== 3) {
+        mesh.material.emissive.setHex(0x44ffaa);
+        mesh.material.emissiveIntensity = 2.0;
+      }
+    } else if (mesh.userData.lastState !== state) {
+      mesh.position.y = 0.08;
+      if (state === 2) {
+        mesh.material.color.setHex(0x333344);
+        mesh.material.emissive.setHex(0x444455);
+        mesh.material.emissiveIntensity = 0.6;
+      } else if (state === 1) {
+        mesh.material.color.setHex(0x44ffaa);
+        mesh.material.emissive.setHex(0x22aa66);
+        mesh.material.emissiveIntensity = 0.5;
+      } else {
+        mesh.material.color.setHex(0x222233);
+        mesh.material.emissive.setHex(0x000000);
+        mesh.material.emissiveIntensity = 0;
+      }
+    }
+    mesh.userData.lastState = state;
+  }
+  
+  // Animate VU meters
+  vuDecay.forEach((val, i) => {
+    vuDecay[i] = Math.max(0, val - 0.02);
+    vuBars[i].scale.y = 0.1 + vuDecay[i] * 2;
+    vuBars[i].position.y = -0.25 + vuDecay[i] * 0.4;
+    vuBars[i].material.emissiveIntensity = 0.3 + vuDecay[i] * 2;
+  });
+  
+  // Animate knob glow — only emissive when actively dragged
+  // Per-knob emissive multipliers to balance perceived brightness across colors
+  // Reds/purples need higher values; greens/cyans need lower
+  const emissiveMultipliers = [
+    3.8,  // TEMPO (red) — weakest perceived, boost most
+    3.2,  // PITCH (orange)
+    2.8,  // FILTER (yellow)
+    1.8,  // REVERB (green) — brightest perceived
+    2.0,  // DELAY (blue)
+    4.2,  // VOLUME (purple) — weak perceived
+    3.4,  // ATTACK (pink)
+    1.9,  // DECAY (cyan) — bright perceived
+    3.5,  // WAVE (magenta/purple)
+    2.2,  // SCALE (yellow-green)
+  ];
+  const lightMultipliers = [
+    2.2, 1.8, 1.6, 1.0, 1.8, 2.4, 1.9, 1.0, 2.0, 1.3,
+  ];
+  knobs.forEach((knob, i) => {
+    const active = isDraggingKnob && activeKnob === knob;
+    if (active) {
+      knob.glowRing.material.emissiveIntensity = emissiveMultipliers[i];
+      knob.glowRing.material.opacity = 0.95;
+    } else {
+      knob.glowRing.material.emissiveIntensity = 0;
+      knob.glowRing.material.opacity = 0.3;
+    }
+  });
+  
+  // Play button state (no pulse)
+  if (isPlaying) {
+    playBtnMat.emissiveIntensity = 0.5;
+    playBtn.position.y = -0.35;
+    triMesh.position.y = -0.35 + 0.11;
+  } else {
+    playBtnMat.emissiveIntensity = 0.3;
+    playBtn.position.y = -0.25;
+    triMesh.position.y = -0.25 + 0.11;
+  }
+  
+  // Reset button spring-back animation
+  if (resetPressed) {
+    const elapsed = now - resetPressTime;
+    if (elapsed < 200) {
+      const t = elapsed / 200;
+      const spring = 1 - Math.pow(1 - t, 3);
+      resetBtn.position.y = -0.35 + spring * 0.1;
+      resetIconGroup.position.y = -0.22 + spring * 0.1;
+    } else {
+      resetBtn.position.y = -0.25;
+      resetIconGroup.position.y = -0.12;
+      resetPressed = false;
+    }
+  } else {
+    resetBtnMat.emissiveIntensity = 0.3;
+  }
+  
+  // FPS counter update
+  fpsFrames++;
+  if (now - fpsLastTime >= 1000) {
+    fpsDiv.textContent = `${fpsFrames} FPS`;
+    fpsDiv.style.color = fpsFrames >= 50 ? '#4f8' : fpsFrames >= 30 ? '#fc4' : '#f44';
+    fpsFrames = 0;
+    fpsLastTime = now;
+  }
+
+  // Throttle info display to ~4 fps
+  if (now - (animate._lastInfoUpdate || 0) > 250) {
+    animate._lastInfoUpdate = now;
+    updateInfoDisplay();
+  }
+  
+  postProcessing.render();
+}
+
+renderer.setAnimationLoop(animate);
+
+// Handle resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
