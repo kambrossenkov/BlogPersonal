@@ -2150,9 +2150,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- SLIDE 2 -->
-                <div style="min-width:100%; width:100%; box-sizing:border-box; height:100%;">
-                  <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; height:100%; display:flex; align-items:center; justify-content:center;">
-                    <p style="color:rgba(255,255,255,0.25); font-size:13px; letter-spacing:3px; text-transform:uppercase;">Próximamente</p>
+                <div style="min-width:100%; width:100%; box-sizing:border-box; cursor:pointer; height:100%;" onclick="abrirModalCarScroll()">
+                  <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; height:100%; display:flex; flex-direction:column;">
+                    <img src="Fotos/foto de portada de Car Scroll.jpg" style="width:100%; height:380px; object-fit:cover; display:block; flex-shrink:0;">
+                    <div style="padding:20px; flex:1; overflow:hidden;">
+                      <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px;">Car Scroll</h3>
+                      <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Un Porsche 3D que rota mientras scrolleás la página</p>
+                    </div>
                   </div>
                 </div>
 
@@ -2178,6 +2182,23 @@ document.addEventListener('DOMContentLoaded', () => {
             function sdPrev() {
               sdIdx = (sdIdx + 2) % 3;
               document.getElementById('sd-track').style.transform = 'translateX(-' + (sdIdx * 100) + '%)';
+            }
+            function abrirModalCarScroll() {
+              document.getElementById('article-modal-tag').textContent = 'INVENTOS';
+              document.getElementById('article-modal-date').textContent = '2025';
+              document.getElementById('article-modal-title').textContent = 'Car Scroll';
+              document.getElementById('article-modal-text').textContent = 'Un Porsche 3D que rota mientras scrolleás la página';
+              var img = document.getElementById('article-modal-img');
+              img.style.display = 'none';
+              var link = document.getElementById('article-modal-link');
+              link.href = 'Car Scroll Down/car scroll.html';
+              link.style.display = 'inline-flex';
+              document.getElementById('article-modal-overlay').style.display = 'block';
+              var scrollY = window.scrollY;
+              document.body.style.position = 'fixed';
+              document.body.style.top = '-' + scrollY + 'px';
+              document.body.style.width = '100%';
+              document.body.style.overflow = 'hidden';
             }
             function abrirModalScrolldown() {
               document.getElementById('article-modal-tag').textContent = 'INVENTOS';
@@ -2228,12 +2249,13 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                 </div>
               </div>
-              <!-- Slide 3: PRÓXIMAMENTE -->
+              <!-- Slide 3: Car Game -->
               <div style="flex:0 0 100%; box-sizing:border-box; padding:24px;">
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:20px; overflow:hidden; cursor:pointer; height:calc(100% - 0px); display:flex; align-items:center; justify-content:center;" onclick="oceanOpenModal(2)">
-                  <div style="text-align:center;">
-                    <p style="color:rgba(255,255,255,0.4); font-size:11px; letter-spacing:2px; text-transform:uppercase; margin:0 0 12px 0;">PRÓXIMAMENTE</p>
-                    <h3 style="color:rgba(255,255,255,0.25); font-size:20px; font-weight:700; margin:0;">En desarrollo</h3>
+                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; cursor:pointer;" onclick="oceanOpenModal(2)">
+                  <img src="Fotos/foto de portada de Car Game.png" style="width:100%; height:240px; object-fit:cover; display:block;">
+                  <div style="padding:20px;">
+                    <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px 0;">Car Game</h3>
+                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.</p>
                   </div>
                 </div>
               </div>
@@ -2266,7 +2288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             var oceanSlides = [
               { title: 'Ping Pong Interactivo', desc: 'Jugate un ping pong contra la máquina y que gane el mejor', url: 'Ping Pong juego/ping pong.html', img: 'Fotos/foto de portada de ping pong.png' },
               { title: 'Synth Machine', desc: 'Un sintetizador 3D interactivo. Tocá las teclas y explorá el sonido en tiempo real', url: 'Synth Machine/synth.html', img: 'Fotos/foto de portada de synth machine.png' },
-              { title: 'Car Game', desc: 'Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.', url: 'Car Game/car game.html', img: '' }
+              { title: 'Car Game', desc: 'Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.', url: 'Car Game/car game.html', img: 'Fotos/foto de portada de Car Game.png' }
             ];
             function oceanOpenModal(i) {
               var d = oceanSlides[i];
