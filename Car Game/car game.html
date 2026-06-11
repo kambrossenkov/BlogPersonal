@@ -477,7 +477,7 @@ scene.add(shadowRedFill)
 
 const dirLight = new THREE.DirectionalLight(0xfff0d8, 3.5)
 dirLight.position.set(10, 20, 10)
-dirLight.castShadow = true
+dirLight.castShadow = false
 dirLight.shadow.mapSize.set(2048, 2048)
 dirLight.shadow.camera.near = 0.5
 dirLight.shadow.camera.far = 100
@@ -826,7 +826,7 @@ chassisGroup.add(chassisDebugBox)
 
 const chassisModel = chassisGltf.scene
 chassisModel.rotation.y = Math.PI / 2
-chassisModel.scale.setScalar(0.29)
+chassisModel.scale.setScalar(0.45)
 chassisModel.position.y = -0.42
 chassisModel.traverse((c) => {
   if (c.isMesh) {
