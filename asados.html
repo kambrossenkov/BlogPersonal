@@ -337,7 +337,7 @@
     margin-top: 4px;
     text-align: center;
     letter-spacing: 0.5px;
-  ">Estoy para ayudar</p>
+  " data-es="Estoy para ayudar" data-en="Here to help">Estoy para ayudar</p>
 
 </div>
 
@@ -353,7 +353,7 @@
       max-width: 620px;
       margin-bottom: 4rem;
     ">
-      <h2 data-i18n="asados-title" style="
+      <h2 data-es="Asados" data-en="Argentine BBQ" style="
         font-family: 'Playfair Display', serif;
         font-size: 88px;
         font-weight: 700;
@@ -364,7 +364,7 @@
         margin: 0;
       ">Asados</h2>
 
-      <p data-i18n="asados-subtitle" style="
+      <p data-es="El ritual argentino del fuego" data-en="The Argentine fire ritual" style="
         font-family: 'Cormorant Garamond', serif;
         font-size: 28px;
         font-style: italic;
@@ -375,7 +375,7 @@
         margin-bottom: 28px;
       ">El ritual argentino del fuego</p>
 
-      <p data-i18n="asados-desc" style="
+      <p data-es="El asado es mucho más que una forma de cocinar: es un ritual, una excusa para reunirse, y uno de mis mayores placeres." data-en="Barbecue is much more than a way of cooking: it's a ritual, an excuse to get together, and one of my greatest pleasures." style="
         font-family: 'Inter', sans-serif;
         font-size: 23px;
         font-weight: 400;
@@ -407,12 +407,38 @@
 
   <script src="script.js" onerror="console.info('Scripts running')"></script>
   <script>
-  window.__idiomaPatch = function (lang) {
-    document.querySelectorAll('[data-es]').forEach(function (el) {
+  function aplicarIdioma(lang) {
+    lang = lang || localStorage.getItem('idioma') || 'es';
+    document.querySelectorAll('[data-es]').forEach(function(el) {
       var val = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es');
-      if (val !== null) el.textContent = val;
+      if (val === null) return;
+      if (el.children.length === 0) {
+        el.textContent = val;
+      } else {
+        el.innerHTML = val;
+      }
     });
-  };
+  }
+  function setIdioma(lang) {
+    localStorage.setItem('idioma', lang);
+    var btnEs = document.getElementById('sidebar-btn-es');
+    var btnEn = document.getElementById('sidebar-btn-en');
+    if (btnEs) {
+      btnEs.style.background = lang === 'es' ? 'rgba(255,255,255,0.15)' : 'transparent';
+      btnEs.style.color      = lang === 'es' ? 'white' : 'rgba(255,255,255,0.4)';
+      btnEs.style.border     = lang === 'es' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+    }
+    if (btnEn) {
+      btnEn.style.background = lang === 'en' ? 'rgba(255,255,255,0.15)' : 'transparent';
+      btnEn.style.color      = lang === 'en' ? 'white' : 'rgba(255,255,255,0.4)';
+      btnEn.style.border     = lang === 'en' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+    }
+    aplicarIdioma(lang);
+  }
+  window.__idiomaPatch = setIdioma;
+  document.addEventListener('DOMContentLoaded', function() {
+    setIdioma(localStorage.getItem('idioma') || 'es');
+  });
   </script>
   <script src="idioma.js"></script>
 

@@ -790,7 +790,7 @@ window.VADER_PARTS = VADER_PARTS;
     margin-top: 4px;
     text-align: center;
     letter-spacing: 0.5px;
-  ">Estoy para ayudar</p>
+  " data-es="Estoy para ayudar" data-en="Here to help">Estoy para ayudar</p>
 
 </div>
 
@@ -948,7 +948,7 @@ window.VADER_PARTS = VADER_PARTS;
     <div class="relative z-10 w-full py-24" style="background:transparent !important;">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <h2 class="titulo-trayectoria text-center mb-16 drop-shadow-md" data-i18n="cur-main-title">Mi Trayectoria</h2>
+        <h2 class="titulo-trayectoria text-center mb-16 drop-shadow-md" data-i18n="cur-main-title" data-es="Mi Trayectoria" data-en="My Journey">Mi Trayectoria</h2>
 
         <div id="timeline-container" class="relative w-full pb-10">
           
@@ -1261,11 +1261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { titulo: 'University Decision and Opportunity', descripcion: 'The leap to ITBA: a deliberate process of academic exploration that culminated in a key educational opportunity.', bullets: ['In-depth research into universities and degree programs.', 'Growing interest in business, analytics and consumer behavior.', 'Selected ITBA as the target institution.', 'Obtained a full scholarship through the evaluation process.', 'Enrolled in the degree program amid the pandemic.'] },
         { titulo: 'Education, Experience and Current Professional Profile', descripcion: 'From education to the real world: consolidating a hybrid profile spanning business, analytics, technology and real-world execution.', bullets: ["Adapted to ITBA's high-demand academic environment.", 'Participated in international market research projects.', 'Experience at a startup (Motivia Health) during the final stage of the degree.', 'Joined Tekne Data Labs with a focus on analytics, marketing and content.', 'Built skills in sales, AI and personal brand building.'] }
       ];
-      window.__idiomaPatch = function(lang) {
-        document.querySelectorAll('[data-es]').forEach(function(el) {
-          var val = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es');
-          if (val !== null) el.textContent = val;
-        });
+      window.__trayectoriaLangPatch = function(lang) {
         if (typeof HITOS_MODAL === 'undefined') return;
         if (!_hitosES) {
           _hitosES = HITOS_MODAL.map(function(h) {
@@ -1654,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <div id="hero-inner" class="relative z-20 w-full max-w-7xl mx-auto px-4 lg:px-8 h-screen flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-12 lg:gap-8 pt-20 lg:pt-0">
     <div class="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
       <div class="hero-title">
-        <span class="titulo-fijo" id="tituloFijo">Pasatiempos que</span>
+        <span class="titulo-fijo" id="tituloFijo">Pasatiempos que me</span>
         <span class="titulo-animado" id="palabraAnimada">apasionan</span>
       </div>
     </div>
@@ -1815,9 +1811,9 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
-  var PALABRAS_ES = ["apasionan", "dan energía", "me definen", "me mueven"];
-  var PALABRAS_EN = ["fascinate me", "energize me", "define me", "move me"];
-  var TITULO_ES   = "Pasatiempos que";
+  var PALABRAS_ES = ["apasionan", "dan energía"];
+  var PALABRAS_EN = ["fascinate me", "energize me"];
+  var TITULO_ES   = "Pasatiempos que me";
   var TITULO_EN   = "Hobbies that";
 
   var palabras = PALABRAS_ES;
@@ -1840,16 +1836,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(girarPalabra, 3000);
 
-  window.__idiomaPatch = function(lang) {
-    document.querySelectorAll('[data-es]').forEach(function(elx) {
-      var val = lang === 'en' ? elx.getAttribute('data-en') : elx.getAttribute('data-es');
-      if (val !== null) elx.textContent = val;
-    });
-    palabras = lang === 'en' ? PALABRAS_EN : PALABRAS_ES;
-    indice   = 0;
-    if (tFijo) tFijo.textContent = lang === 'en' ? TITULO_EN : TITULO_ES;
-    if (el) el.textContent = palabras[0];
-  };
 </script>
 
 <script>
@@ -2064,7 +2050,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <section class="flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
           <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
             <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight transition-colors" data-es="La moda de las páginas webs" data-en="The Web Design Trend">La moda de las páginas webs</h2>
-            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Luego del boom de la IA y las mejoras observadas en los modelos del mercado..." data-en="Following the AI boom...">
+            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Luego del boom de la IA y las mejoras observadas en los modelos del mercado, entendí que esto permite una mayor facilidad para diseñar soluciones tecnológicas a medida para comercios que necesitan una presencia web con una finalidad específica. Mi objetivo es acercarles a estos comerciantes una solución personalizada según su necesidad concreta en ese momento." data-en="Following the AI boom and the improvements observed in market models, I realized this enables easier design of tailored tech solutions for businesses that need a specific web presence. My goal is to offer each merchant a personalized solution based on their specific need at that moment.">
               Luego del boom de la IA y las mejoras observadas en los modelos del mercado, entendí que esto permite una mayor facilidad para diseñar soluciones tecnológicas a medida para comercios que necesitan una presencia web con una finalidad específica. Mi objetivo es acercarles a estos comerciantes una solución personalizada según su necesidad concreta en ese momento.
             </p>
             <div class="pt-2">
@@ -2075,7 +2061,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="webmoda.html" class="block relative z-10 overflow-hidden rounded-xl h-64 w-full group border border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <img src="Fotos/Portadad_de_webmoda.png" alt="La moda de las páginas webs" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                <span class="text-white font-semibold tracking-wide">Ver detalle</span>
+                <span class="text-white font-semibold tracking-wide" data-es="Ver detalle" data-en="View details">Ver detalle</span>
               </div>
             </a>
           </div>
@@ -2085,7 +2071,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <section class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16 group">
           <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
             <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight transition-colors" data-es="Mi primera página web" data-en="My First Website">Mi primera página web</h2>
-            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Esta es mi primera página web..." data-en="This is my first website...">
+            <p class="text-lg text-gray-200 leading-relaxed max-w-lg" data-es="Esta es mi primera página web que desarrollé para la materia Programación Web el 11/21/22, la cual me permitió incursionar en los lenguajes de programación y ver soluciones tecnológicas para negocios. Acá se verá un caso de un negocio de venta de alcohol para que la gente pueda pedirla a través de una web, destacándose que es responsive para desktop y celular. Vale recordar el contexto: no existía IA para resolver los problemas que surgían — había que interpretar y saber encontrar la mejor solución por uno mismo." data-en="This is my first website, developed for a Web Programming course on 11/21/22. It let me explore programming languages and technology solutions for businesses. It showcases an alcohol delivery business where customers can order online — featuring a responsive design for both desktop and mobile. Worth noting the context: AI tools didn't exist to solve the problems that came up — you had to interpret them and find the best solution yourself.">
               Esta es mi primera página web que desarrollé para la materia Programación Web el 11/21/22, la cual me permitió incursionar en los lenguajes de programación y ver soluciones tecnológicas para negocios. Acá se verá un caso de un negocio de venta de alcohol para que la gente pueda pedirla a través de una web, destacándose que es responsive para desktop y celular. Vale recordar el contexto: no existía IA para resolver los problemas que surgían — había que interpretar y saber encontrar la mejor solución por uno mismo.
             </p>
             <div class="pt-2">
@@ -2096,7 +2082,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="https://kons-pw-2022.vercel.app/Trabajo%20Final/index.html" target="_blank" rel="noopener noreferrer" class="block relative z-10 overflow-hidden rounded-xl h-64 w-full group border border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <img src="Fotos/Mi primera pagina web.png" alt="Mi primera página web" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                <span class="text-white font-semibold tracking-wide">Ver detalle</span>
+                <span class="text-white font-semibold tracking-wide" data-es="Ver detalle" data-en="View details">Ver detalle</span>
               </div>
             </a>
           </div>
@@ -2106,7 +2092,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <section class="flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
           <div class="w-full md:w-1/2 space-y-4 md:space-y-6 order-2 md:order-1 relative z-10">
             <h3 class="text-3xl font-bold mb-4 text-white relative z-10" data-es="Evolución del Diseño" data-en="Evolution of Design">Evolución del Diseño</h3>
-            <p class="text-gray-200 relative z-10" data-es="Verán un recorrido..." data-en="You will see...">
+            <p class="text-gray-200 relative z-10" data-es="Verán un recorrido por el diseño gráfico y cómo este fue evolucionando gracias a las herramientas tecnológicas en cada momento histórico hasta el presente. Cabe destacar que todo este contenido fue creado con IA en abril de 2025." data-en="You'll see a journey through graphic design and how it evolved thanks to the technological tools available at each historical moment up to the present. Worth noting that all this content was created with AI in April 2025.">
               Verán un recorrido por el diseño gráfico y cómo este fue evolucionando gracias a las herramientas tecnológicas en cada momento histórico hasta el presente. Cabe destacar que todo este contenido fue creado con IA en abril de 2025.
             </p>
             <div class="pt-2">
@@ -2117,7 +2103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="invento-meme.html" target="_blank" class="block relative z-10 overflow-hidden rounded-xl h-64 w-full group border border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300">
                 <img src="Fotos/MEME.jpg" alt="Portada del Proyecto Meme" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                    <span class="text-white font-semibold tracking-wide">Ver detalle</span>
+                    <span class="text-white font-semibold tracking-wide" data-es="Ver detalle" data-en="View details">Ver detalle</span>
                 </div>
             </a>
           </div>
@@ -2128,8 +2114,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <!-- Título y subtexto -->
           <div style="margin-bottom:32px;">
-            <h2 style="font-family:'General Sans','Inter',sans-serif; font-size:clamp(32px,4vw,52px); font-weight:700; color:white; margin-bottom:12px;">Efectos de scroll down</h2>
-            <p style="font-family:'Inter',sans-serif; font-size:16px; line-height:1.7; color:rgba(255,255,255,0.55); max-width:600px;">Tenés que scrollear para abajo en cualquiera de estas plantillas que quieras ingresar y disfrutarlo.</p>
+            <h2 style="font-family:'General Sans','Inter',sans-serif; font-size:clamp(32px,4vw,52px); font-weight:700; color:white; margin-bottom:12px;" data-es="Efectos de scroll down" data-en="Scroll-Down Effects">Efectos de scroll down</h2>
+            <p style="font-family:'Inter',sans-serif; font-size:16px; line-height:1.7; color:rgba(255,255,255,0.55); max-width:600px;" data-es="Tenés que scrollear para abajo en cualquiera de estas plantillas que quieras ingresar y disfrutarlo." data-en="Scroll down in any of these templates to enter and enjoy them.">Tenés que scrollear para abajo en cualquiera de estas plantillas que quieras ingresar y disfrutarlo.</p>
           </div>
 
           <!-- Carousel -->
@@ -2143,7 +2129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="Fotos/foto_portada_de_cartas.jpg" style="width:100%; height:380px; object-fit:cover; display:block; flex-shrink:0;">
                     <div style="padding:20px; flex:1; overflow:hidden;">
                       <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px;">The Gravitational Card-Cascade</h3>
-                      <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.</p>
+                      <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;" data-es="En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini." data-en="In March 2025, I saw through reels that visual effects could be generated with certain objects by taking two photos — one of the initial state and one of the final state — and feeding them into an AI prompt. The original effect was designed for Kling o3, but I solved it using Gemini.">En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.</p>
                     </div>
                   </div>
                 </div>
@@ -2154,7 +2140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="Fotos/foto de portada de Car Scroll.jpg" style="width:100%; height:380px; object-fit:cover; display:block; flex-shrink:0;">
                     <div style="padding:20px; flex:1; overflow:hidden;">
                       <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px;">Car Scroll</h3>
-                      <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Un Porsche 3D que rota mientras scrolleás la página</p>
+                      <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;" data-es="Un Porsche 3D que rota mientras scrolleás la página" data-en="A 3D Porsche that rotates as you scroll the page">Un Porsche 3D que rota mientras scrolleás la página</p>
                     </div>
                   </div>
                 </div>
@@ -2162,7 +2148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- SLIDE 3 -->
                 <div style="min-width:100%; width:100%; box-sizing:border-box; height:100%;">
                   <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; height:100%; display:flex; align-items:center; justify-content:center;">
-                    <p style="color:rgba(255,255,255,0.25); font-size:13px; letter-spacing:3px; text-transform:uppercase;">Próximamente</p>
+                    <p style="color:rgba(255,255,255,0.25); font-size:13px; letter-spacing:3px; text-transform:uppercase;" data-es="Próximamente" data-en="Coming soon">Próximamente</p>
                   </div>
                 </div>
 
@@ -2183,10 +2169,13 @@ document.addEventListener('DOMContentLoaded', () => {
               document.getElementById('sd-track').style.transform = 'translateX(-' + (sdIdx * 100) + '%)';
             }
             function abrirModalCarScroll() {
-              document.getElementById('article-modal-tag').textContent = 'INVENTOS';
-              document.getElementById('article-modal-date').textContent = '2025';
+              var lang = idiomaActual;
+              document.getElementById('article-modal-tag').textContent   = lang === 'en' ? 'PROJECTS'  : 'INVENTOS';
+              document.getElementById('article-modal-date').textContent  = '2025';
               document.getElementById('article-modal-title').textContent = 'Car Scroll';
-              document.getElementById('article-modal-text').textContent = 'Un Porsche 3D que rota mientras scrolleás la página';
+              document.getElementById('article-modal-text').textContent  = lang === 'en'
+                ? 'A 3D Porsche that rotates as you scroll the page'
+                : 'Un Porsche 3D que rota mientras scrolleás la página';
               var img = document.getElementById('article-modal-img');
               img.src = 'Fotos/foto de portada de Car Scroll.jpg';
               img.style.display = 'block';
@@ -2201,10 +2190,15 @@ document.addEventListener('DOMContentLoaded', () => {
               document.body.style.overflow = 'hidden';
             }
             function abrirModalScrolldown() {
-              document.getElementById('article-modal-tag').textContent = 'INVENTOS';
-              document.getElementById('article-modal-date').textContent = 'Mar 2025';
-              document.getElementById('article-modal-title').textContent = 'Efectos de scroll down';
-              document.getElementById('article-modal-text').textContent = 'En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.';
+              var lang = idiomaActual;
+              document.getElementById('article-modal-tag').textContent   = lang === 'en' ? 'PROJECTS' : 'INVENTOS';
+              document.getElementById('article-modal-date').textContent  = 'Mar 2025';
+              document.getElementById('article-modal-title').textContent = lang === 'en'
+                ? 'The Gravitational Card-Cascade'
+                : 'Efectos de scroll down';
+              document.getElementById('article-modal-text').textContent  = lang === 'en'
+                ? 'In March 2025, I saw through reels that visual effects could be generated with certain objects by taking two photos — one of the initial state and one of the final state — and feeding them into an AI prompt. The original effect was designed for Kling o3, but I solved it using Gemini.'
+                : 'En marzo de 2025 estuve viendo a través de reels que se podían generar efectos visuales con ciertos objetos tomando dos fotos: una del estado inicial y otra del estado final, aplicándole un prompt a una IA. El efecto original estaba pensado para Kling o3, pero yo lo resolví utilizando Gemini.';
               var img = document.getElementById('article-modal-img');
               img.src = 'Fotos/foto_portada_de_cartas.jpg';
               img.style.display = 'block';
@@ -2224,8 +2218,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- Section 4: Simulación del Océano — carousel -->
         <section style="width:100%;padding:0;position:relative;">
           <div style="margin-bottom: 32px;">
-            <h2 style="font-family: 'General Sans', 'Inter', sans-serif; font-size: clamp(32px, 4vw, 52px); font-weight: 700; color: white; margin-bottom: 12px;">Efectos inmersivos</h2>
-            <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.55); max-width: 600px;">Apartados que te redireccionan a lugares inmersivos, los cuales tardan en cargar, por lo cual hay que ser paciente, pero no tardan más de dos minutos en cargarse, y son bastante divertidos.</p>
+            <h2 style="font-family: 'General Sans', 'Inter', sans-serif; font-size: clamp(32px, 4vw, 52px); font-weight: 700; color: white; margin-bottom: 12px;" data-es="Efectos inmersivos" data-en="Immersive Experiences">Efectos inmersivos</h2>
+            <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.55); max-width: 600px;" data-es="Apartados que te redireccionan a lugares inmersivos, los cuales tardan en cargar, por lo cual hay que ser paciente, pero no tardan más de dos minutos en cargarse, y son bastante divertidos." data-en="Sections that redirect you to immersive experiences. They may take a moment to load, so be patient — no more than two minutes — and they're quite fun.">Apartados que te redireccionan a lugares inmersivos, los cuales tardan en cargar, por lo cual hay que ser paciente, pero no tardan más de dos minutos en cargarse, y son bastante divertidos.</p>
           </div>
           <div style="position:relative; overflow:hidden; border-radius:16px; border:1px solid rgba(255,255,255,0.08); height:420px;">
             <div id="ocean-carousel" style="display:flex; transition:transform 0.4s ease; height:100%;">
@@ -2234,8 +2228,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; cursor:pointer;" onclick="oceanOpenModal(0)">
                   <img src="Fotos/foto de portada de ping pong.png" style="width:100%; height:240px; object-fit:cover; display:block;">
                   <div style="padding:20px;">
-                    <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px 0;">Ping Pong Interactivo</h3>
-                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Jugate un ping pong contra la máquina y que gane el mejor</p>
+                    <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px 0;" data-es="Ping Pong Interactivo" data-en="Interactive Ping Pong">Ping Pong Interactivo</h3>
+                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;" data-es="Jugate un ping pong contra la máquina y que gane el mejor" data-en="Play ping pong against the machine — may the best one win">Jugate un ping pong contra la máquina y que gane el mejor</p>
                   </div>
                 </div>
               </div>
@@ -2245,7 +2239,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <img src="Fotos/foto de portada de synth machine.png" style="width:100%; height:240px; object-fit:cover; display:block;">
                   <div style="padding:20px;">
                     <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px 0;">Synth Machine</h3>
-                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Un sintetizador 3D interactivo. Tocá las teclas y explorá el sonido en tiempo real</p>
+                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;" data-es="Un sintetizador 3D interactivo. Tocá las teclas y explorá el sonido en tiempo real" data-en="An interactive 3D synthesizer. Press the keys and explore sound in real time">Un sintetizador 3D interactivo. Tocá las teclas y explorá el sonido en tiempo real</p>
                   </div>
                 </div>
               </div>
@@ -2255,7 +2249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <img src="Fotos/foto de portada de Car Game.png" style="width:100%; height:240px; object-fit:cover; display:block;">
                   <div style="padding:20px;">
                     <h3 style="color:white; font-size:20px; font-weight:700; margin:0 0 8px 0;">Car Game</h3>
-                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;">Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.</p>
+                    <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6; margin:0;" data-es="Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER." data-en="Drive a 3D vehicle through procedurally generated terrain. Real physics with RAPIER.">Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.</p>
                   </div>
                 </div>
               </div>
@@ -2271,7 +2265,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div style="padding:24px;">
                 <h3 id="ocean-modal-title" style="font-size:22px; font-weight:700; color:#f0f0f0; margin:0 0 10px 0;"></h3>
                 <p id="ocean-modal-desc" style="font-size:14px; color:rgba(255,255,255,0.6); margin:0 0 20px 0; line-height:1.6;"></p>
-                <a id="ocean-modal-link" href="#" target="_blank" style="display:inline-block; padding:10px 24px; background:#fff; color:#000; border-radius:30px; font-size:14px; font-weight:600; text-decoration:none;">Ir al sitio →</a>
+                <a id="ocean-modal-link" href="#" target="_blank" style="display:inline-block; padding:10px 24px; background:#fff; color:#000; border-radius:30px; font-size:14px; font-weight:600; text-decoration:none;" data-es="Ir al sitio →" data-en="Visit site →">Ir al sitio →</a>
               </div>
             </div>
           </div>
@@ -2286,15 +2280,16 @@ document.addEventListener('DOMContentLoaded', () => {
               document.getElementById('ocean-carousel').style.transform = 'translateX(-' + (oceanIndex * 100) + '%)';
             }
             var oceanSlides = [
-              { title: 'Ping Pong Interactivo', desc: 'Jugate un ping pong contra la máquina y que gane el mejor', url: 'Ping Pong juego/ping pong.html', img: 'Fotos/foto de portada de ping pong.png' },
-              { title: 'Synth Machine', desc: 'Un sintetizador 3D interactivo. Tocá las teclas y explorá el sonido en tiempo real', url: 'Synth Machine/synth.html', img: 'Fotos/foto de portada de synth machine.png' },
-              { title: 'Car Game', desc: 'Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.', url: 'Car Game/car game.html', img: 'Fotos/foto de portada de Car Game.png' }
+              { title: 'Ping Pong Interactivo', title_en: 'Interactive Ping Pong', desc: 'Jugate un ping pong contra la máquina y que gane el mejor', desc_en: 'Play ping pong against the machine — may the best one win', url: 'Ping Pong juego/ping pong.html', img: 'Fotos/foto de portada de ping pong.png' },
+              { title: 'Synth Machine', title_en: 'Synth Machine', desc: 'Un sintetizador 3D interactivo. Tocá las teclas y explorá el sonido en tiempo real', desc_en: 'An interactive 3D synthesizer. Press the keys and explore sound in real time', url: 'Synth Machine/synth.html', img: 'Fotos/foto de portada de synth machine.png' },
+              { title: 'Car Game', title_en: 'Car Game', desc: 'Manejá un vehículo 3D por terrenos generados proceduralmente. Física real con RAPIER.', desc_en: 'Drive a 3D vehicle through procedurally generated terrain. Real physics with RAPIER.', url: 'Car Game/car game.html', img: 'Fotos/foto de portada de Car Game.png' }
             ];
             function oceanOpenModal(i) {
               var d = oceanSlides[i];
+              var lang = (typeof idiomaActual !== 'undefined') ? idiomaActual : (localStorage.getItem('idioma') || 'es');
               var preview = document.getElementById('ocean-modal-preview');
-              document.getElementById('ocean-modal-title').textContent = d.title;
-              document.getElementById('ocean-modal-desc').textContent = d.desc;
+              document.getElementById('ocean-modal-title').textContent = lang === 'en' ? (d.title_en || d.title) : d.title;
+              document.getElementById('ocean-modal-desc').textContent = lang === 'en' ? (d.desc_en || d.desc) : d.desc;
               var link = document.getElementById('ocean-modal-link');
               link.href = d.url;
               link.style.display = d.url === '#' ? 'none' : 'inline-block';
@@ -2538,7 +2533,7 @@ document.addEventListener('DOMContentLoaded', () => {
           padding-top: 12px;
           max-width: 560px;
         ">
-          <h2 style="
+          <h2 id="perfil-quote-h2" style="
             font-family: 'Satoshi', 'Inter', sans-serif;
             font-size: clamp(40px, 4.5vw, 72px);
             font-weight: 700;
@@ -2559,7 +2554,7 @@ document.addEventListener('DOMContentLoaded', () => {
             color: rgba(255,255,255,0.72);
             margin: 0;
           ">
-            Una frase que siempre tengo presente porque representa muchos de los resultados que fui alcanzando a lo largo de mi vida.
+            <span data-es="Una frase que siempre tengo presente porque representa muchos de los resultados que fui alcanzando a lo largo de mi vida." data-en="A phrase I always keep in mind because it represents many of the results I've achieved throughout my life.">Una frase que siempre tengo presente porque representa muchos de los resultados que fui alcanzando a lo largo de mi vida.</span>
           </p>
           <p style="
             font-family: 'Inter', sans-serif;
@@ -2568,14 +2563,14 @@ document.addEventListener('DOMContentLoaded', () => {
             color: rgba(255,255,255,0.72);
             margin: 0;
           ">
-            Si te interesó lo que viste hasta acá, te dejo algunos proyectos destacados desarrollados por cuenta propia. Y si querés conocer más sobre mi experiencia laboral, podés escribirme a través de mis contactos.
+            <span data-es="Si te interesó lo que viste hasta acá, te dejo algunos proyectos destacados desarrollados por cuenta propia. Y si querés conocer más sobre mi experiencia laboral, podés escribirme a través de mis contactos." data-en="If you liked what you saw, here are some standout projects I developed on my own. And if you'd like to know more about my work experience, feel free to reach out through my contacts.">Si te interesó lo que viste hasta acá, te dejo algunos proyectos destacados desarrollados por cuenta propia. Y si querés conocer más sobre mi experiencia laboral, podés escribirme a través de mis contactos.</span>
           </p>
         </div>
       </div>
 
       <section id="articles" class="py-12">
         <div class="flex items-center justify-between mb-12 animate-slide-up" style="animation-delay: 200ms; padding-left: 0; margin-left: 0;">
-          <h2 data-i18n="articles-title" class="text-3xl md:text-4xl font-bold tracking-tight text-white transition-colors duration-300" style="padding-left:0; margin-left:0;">Artículos Destacados</h2>
+          <h2 data-i18n="articles-title" data-es="Artículos Destacados" data-en="Featured Articles" class="text-3xl md:text-4xl font-bold tracking-tight text-white transition-colors duration-300" style="padding-left:0; margin-left:0;">Artículos Destacados</h2>
         </div>
         <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div onclick="abrirArticleModal(0)" role="button" tabindex="0" class="block bg-[#111] rounded-2xl overflow-hidden border border-white/10 shadow-sm hover:shadow-md transition-all duration-300 animate-slide-up group cursor-pointer" style="animation-delay: 200ms;">
@@ -2608,22 +2603,22 @@ document.addEventListener('DOMContentLoaded', () => {
       <section class="my-20 rounded-[2.5rem] bg-[#111] p-8 md:p-16 text-center animate-scale-in border border-white/10 transition-colors duration-300 shadow-sm">
         <div class="max-w-4xl mx-auto space-y-10">
           <div class="space-y-4">
-            <h2 data-i18n="chat-title" class="text-4xl md:text-5xl font-bold tracking-tight text-white">¿Querés Charlar?</h2>
-            <p data-i18n="chat-desc" class="text-xl text-white/50 leading-relaxed">mandame tu email o escribime por wpp</p>
+            <h2 data-i18n="chat-title" data-es="¿Querés Charlar?" data-en="Want to Chat?" class="text-4xl md:text-5xl font-bold tracking-tight text-white">¿Querés Charlar?</h2>
+            <p data-i18n="chat-desc" data-es="mandame tu email o escribime por wpp" data-en="send me your email or message me on WhatsApp" class="text-xl text-white/50 leading-relaxed">mandame tu email o escribime por wpp</p>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-black/50 p-6 md:p-10 rounded-3xl border border-white/10 shadow-inner">
             <div class="flex flex-col gap-1 w-full">
               <form id="email-form" class="flex flex-col sm:flex-row gap-4 w-full" action="https://api.web3forms.com/submit" method="POST">
                 <input type="hidden" name="access_key" value="477b2e2f-0dd9-4167-b205-2e239525342b">
                 <input id="email-input" type="email" name="email" required data-i18n-placeholder="chat-placeholder" placeholder="Tu correo electrónico" class="flex-1 px-6 py-4 rounded-full border border-white/10 bg-black focus:outline-none focus:ring-2 focus:ring-[#3b82f6] transition-all text-white" />
-                <button type="submit" data-i18n="chat-btn-send" class="px-8 py-4 rounded-full bg-[#3b82f6] text-white font-medium hover:opacity-90 shadow hover:-translate-y-1 transition-all cursor-pointer">enviar</button>
+                <button type="submit" data-i18n="chat-btn-send" data-es="enviar" data-en="send" class="px-8 py-4 rounded-full bg-[#3b82f6] text-white font-medium hover:opacity-90 shadow hover:-translate-y-1 transition-all cursor-pointer">enviar</button>
               </form>
               <div id="email-error" style="display:none; color:#ef4444; font-size:0.875rem; padding-left:1.5rem;"></div>
             </div>
             <div class="flex justify-center w-full">
               <a href="https://wa.me/541134111875?text=Hola%20Konstantino,%20te%20contacto%20desde%20tu%20sitio%20web" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-10 py-4 rounded-full bg-[#25D366] text-white font-medium hover:bg-[#128C7E] shadow hover:-translate-y-1 transition-all w-full sm:w-auto justify-center cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-                <span data-i18n="chat-btn-wpp">escribir</span>
+                <span data-i18n="chat-btn-wpp" data-es="escribir" data-en="message">escribir</span>
               </a>
             </div>
           </div>
@@ -2795,8 +2790,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <p id="article-modal-text" style="font-family:'Inter',sans-serif; font-size:15px; line-height:1.85; color:rgba(255,255,255,0.75); margin-bottom:24px;"></p>
 
         <div style="display:flex; gap:12px; justify-content:flex-end;">
-          <button onclick="cerrarArticleModal()" style="padding:10px 20px; border-radius:100px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); font-family:'Space Grotesk',sans-serif; font-size:14px; cursor:pointer;">Cerrar</button>
-          <a id="article-modal-link" href="#" target="_blank" style="padding:10px 20px; border-radius:100px; background:#F5F7FA; color:#0a0f1e; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">Visitar sitio →</a>
+          <button onclick="cerrarArticleModal()" style="padding:10px 20px; border-radius:100px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); font-family:'Space Grotesk',sans-serif; font-size:14px; cursor:pointer;" data-es="Cerrar" data-en="Close">Cerrar</button>
+          <a id="article-modal-link" href="#" target="_blank" style="padding:10px 20px; border-radius:100px; background:#F5F7FA; color:#0a0f1e; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;" data-es="Visitar sitio →" data-en="Visit site →">Visitar sitio →</a>
         </div>
       </div>
 
@@ -2805,31 +2800,38 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <script>
+    var idiomaActual = localStorage.getItem('idioma') || 'es';
+
     const articleData = [
       {
-        tag: "MI PERFIL",
+        tag: "MI PERFIL",       tag_en: "MY PROFILE",
         date: "20 Mar 2026",
         title: "El primer desarrollo de mi página web",
+        title_en: "The first development of my website",
         img: "Fotos/mi primer comit.png",
         text: "En el boom de la IA en 2025, bajando las barreras técnicas y ofreciendo reinventarse en nuevas skills, me animé a desarrollar una página web con mucha IA, la cual terminaría siendo el boceto de la actual página en la que estás.",
+        text_en: "In the AI boom of 2025, with lower technical barriers and the opportunity to reinvent yourself with new skills, I dared to develop a website heavily assisted by AI — which would end up being the draft of the current page you're on.",
         url: "https://konstantino-ambrossenkov.vercel.app/inicio.html"
       },
       {
-        tag: "INVENTOS",
+        tag: "INVENTOS",        tag_en: "PROJECTS",
         date: "20-mar-2025",
         title: "Kiosco Casa Lupi",
+        title_en: "Kiosco Casa Lupi",
         img: "Fotos/qr de casa lupi.jpeg",
         text: "Kiosco de unos conocidos muy cercanos míos que les brindé una ayuda tecnológica y administrativa para modernizar su negocio.",
+        text_en: "A kiosk belonging to close acquaintances of mine, for whom I provided technological and administrative support to modernize their business.",
         url: "webmoda.html"
       }
     ];
 
     function abrirArticleModal(index) {
       const d = articleData[index];
-      document.getElementById('article-modal-tag').textContent = d.tag;
-      document.getElementById('article-modal-date').textContent = d.date;
-      document.getElementById('article-modal-title').textContent = d.title;
-      document.getElementById('article-modal-text').textContent = d.text;
+      const lang = idiomaActual;
+      document.getElementById('article-modal-tag').textContent   = lang === 'en' ? (d.tag_en   || d.tag)   : d.tag;
+      document.getElementById('article-modal-date').textContent  = d.date;
+      document.getElementById('article-modal-title').textContent = lang === 'en' ? (d.title_en || d.title) : d.title;
+      document.getElementById('article-modal-text').textContent  = lang === 'en' ? (d.text_en  || d.text)  : d.text;
 
       const img = document.getElementById('article-modal-img');
       if (d.img) { img.src = d.img; img.style.display = 'block'; }
@@ -2865,7 +2867,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <footer id="contacto" class="relative z-10 border-t border-white/10 mt-16 bg-black/50 backdrop-blur-md transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col items-center gap-10">
       <div class="w-full text-center md:text-left">
-        <h3 data-i18n="ft-contact-title" class="text-2xl font-bold text-white">Contactame</h3>
+        <h3 data-i18n="ft-contact-title" data-es="Contactame" data-en="Contact me" class="text-2xl font-bold text-white">Contactame</h3>
       </div>
       <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full">
         <a href="mailto:k.ambrossenkov@gmail.com" class="flex items-center gap-3 text-white hover:text-[#3b82f6] transition-colors">
@@ -2891,7 +2893,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <img src="Fotos/firma AK.jfif" alt="Firma AK" class="h-16 object-contain" onerror="this.outerHTML='<span class=\'text-2xl font-serif italic text-white opacity-70\'>Firma AK</span>'" />
       </div>
       <div class="pt-8 w-full border-t border-white/10 text-center text-white/50 transition-colors duration-300">
-        <p data-i18n="ft-help" class="font-medium text-lg">Estoy para ayudar</p>
+        <p data-i18n="ft-help" data-es="Estoy para ayudar" data-en="Here to help" class="font-medium text-lg">Estoy para ayudar</p>
       </div>
     </div>
   </footer>
@@ -3174,24 +3176,61 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- TOGGLE DE IDIOMA ----
     function setIdioma(lang) {
       localStorage.setItem('idioma', lang);
-      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
-      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-      document.querySelectorAll('[data-es]').forEach(function(el) {
-        if (el.tagName !== 'INPUT') {
-          el.textContent = lang === 'es' ? el.getAttribute('data-es') : el.getAttribute('data-en');
-        }
+      if (typeof idiomaActual !== 'undefined') idiomaActual = lang;
+
+      // Sidebar buttons
+      var btnEs = document.getElementById('sidebar-btn-es');
+      var btnEn = document.getElementById('sidebar-btn-en');
+      if (btnEs) {
+        btnEs.style.background = lang === 'es' ? 'rgba(255,255,255,0.15)' : 'transparent';
+        btnEs.style.color      = lang === 'es' ? 'white' : 'rgba(255,255,255,0.4)';
+        btnEs.style.border     = lang === 'es' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+      }
+      if (btnEn) {
+        btnEn.style.background = lang === 'en' ? 'rgba(255,255,255,0.15)' : 'transparent';
+        btnEn.style.color      = lang === 'en' ? 'white' : 'rgba(255,255,255,0.4)';
+        btnEn.style.border     = lang === 'en' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+      }
+
+      // All data-es elements
+      document.querySelectorAll('[data-es]').forEach(function(elem) {
+        if (elem.tagName === 'INPUT') return;
+        var val = lang === 'es' ? elem.getAttribute('data-es') : elem.getAttribute('data-en');
+        if (val !== null) elem.textContent = val;
       });
-      var input = document.getElementById('popupNameInput');
-      if (input) input.placeholder = lang === 'es' ? 'Tu nombre' : 'Your name';
+
+      // Perfil hero quote (innerHTML because of inner span)
+      var perfilQuote = document.getElementById('perfil-quote-h2');
+      if (perfilQuote) {
+        var hl = '<span style="color:#00D4FF;filter:drop-shadow(0 0 8px rgba(0,212,255,0.35));">';
+        perfilQuote.innerHTML = lang === 'en'
+          ? 'A succession<br>of small steps<br>leads to a great<br>' + hl + 'result</span>'
+          : 'Una sucesión<br>de pequeños pasos<br>conlleva un gran<br>' + hl + 'resultado</span>';
+      }
+
+      // Pasatiempos animated words
+      if (typeof PALABRAS_ES !== 'undefined' && typeof PALABRAS_EN !== 'undefined') {
+        palabras = lang === 'en' ? PALABRAS_EN : PALABRAS_ES;
+        indice   = 0;
+        var tFijoEl   = document.getElementById('tituloFijo');
+        var palabraEl = document.getElementById('palabraAnimada');
+        if (tFijoEl)   tFijoEl.textContent   = lang === 'en' ? TITULO_EN : TITULO_ES;
+        if (palabraEl) palabraEl.textContent = palabras[0];
+      }
+
+      // Trayectoria HITOS_MODAL
+      if (typeof window.__trayectoriaLangPatch === 'function') window.__trayectoriaLangPatch(lang);
+
+      // Input placeholders
+      var popupInput = document.getElementById('popupNameInput');
+      if (popupInput) popupInput.placeholder = lang === 'es' ? 'Tu nombre' : 'Your name';
+      var emailInput = document.getElementById('email-input');
+      if (emailInput) emailInput.placeholder = lang === 'es' ? 'Tu correo electrónico' : 'Your email address';
     }
 
-    (function() {
-      var lang = localStorage.getItem('idioma') || 'es';
-      var btnEs = document.getElementById('btn-es');
-      var btnEn = document.getElementById('btn-en');
-      if (btnEs) btnEs.classList.toggle('active', lang === 'es');
-      if (btnEn) btnEn.classList.toggle('active', lang === 'en');
-    })();
+    document.addEventListener('DOMContentLoaded', function() {
+      setIdioma(localStorage.getItem('idioma') || 'es');
+    });
   </script>
 
   <script>

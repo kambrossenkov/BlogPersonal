@@ -496,7 +496,7 @@
     margin-top: 4px;
     text-align: center;
     letter-spacing: 0.5px;
-  ">Estoy para ayudar</p>
+  " data-es="Estoy para ayudar" data-en="Here to help">Estoy para ayudar</p>
 
 </div>
 
@@ -510,8 +510,8 @@
 
   <!-- Hero title block -->
   <div class="hero">
-    <h2 class="hero-title" data-i18n="cal-title">Calistenia</h2>
-    <p class="hero-subtitle" data-i18n="cal-subtitle">Un deporte que me ayuda a tener un autocontrol de mi cuerpo</p>
+    <h2 class="hero-title" data-i18n="cal-title" data-es="Calistenia" data-en="Calisthenics">Calistenia</h2>
+    <p class="hero-subtitle" data-i18n="cal-subtitle" data-es="Un deporte que me ayuda a tener un autocontrol de mi cuerpo" data-en="A sport that helps me maintain self-control of my body">Un deporte que me ayuda a tener un autocontrol de mi cuerpo</p>
   </div>
 
   <!-- Carrusel -->
@@ -538,7 +538,7 @@
           <div class="c-body">
             <p class="c-title" data-i18n="cal-s0-title" data-es="Inicio 2018" data-en="Beginning 2018">Inicio 2018</p>
             <p class="c-desc" data-i18n="cal-s0-desc" data-es="Les muestro un recorrido de mis inicios en este deporte. Ejercicios que me costaban mucho, que no podía llegar a realizar. Pero a lo largo del año 2018 van a ver cómo hubo una evolución hasta poder lograrlos." data-en="I take you through my early days in this sport. Exercises I struggled with and couldn't manage to do. But throughout 2018 you'll see how I evolved until I was finally able to achieve them.">Les muestro un recorrido de mis inicios en este deporte. Ejercicios que me costaban mucho, que no podía llegar a realizar. Pero a lo largo del año 2018 van a ver cómo hubo una evolución hasta poder lograrlos.</p>
-            <button class="c-btn" data-i18n="cal-btn-video" onclick="openModal(0)">▶ Ver video</button>
+            <button class="c-btn" data-i18n="cal-btn-video" data-es="▶ Ver video" data-en="▶ Watch video" onclick="openModal(0)">▶ Ver video</button>
           </div>
         </div>
         <!-- FIN SLIDE 1 -->
@@ -561,7 +561,7 @@
           <div class="c-body">
             <p class="c-title" data-i18n="cal-s1-title" data-es="2019 hasta marzo 2020: la profundización" data-en="2019 to March 2020: Going Deeper">2019 hasta marzo 2020: la profundización</p>
             <p class="c-desc" data-i18n="cal-s1-desc" data-es="Luego de incursionar en este deporte, entender qué ejercicios y movimientos existen, y haber conocido múltiples personas que me ayudaron a progresar, les traigo un avance de cómo fue mi evolución previamente a que explote la pandemia." data-en="After venturing into this sport, understanding which exercises and movements exist, and having met many people who helped me progress, I bring you an overview of how my evolution went up until the pandemic hit.">Luego de incursionar en este deporte, entender qué ejercicios y movimientos existen, y haber conocido múltiples personas que me ayudaron a progresar, les traigo un avance de cómo fue mi evolución previamente a que explote la pandemia.</p>
-            <button class="c-btn" data-i18n="cal-btn-video" onclick="openModal(1)">▶ Ver video</button>
+            <button class="c-btn" data-i18n="cal-btn-video" data-es="▶ Ver video" data-en="▶ Watch video" onclick="openModal(1)">▶ Ver video</button>
           </div>
         </div>
         <!-- FIN SLIDE 2 -->
@@ -609,7 +609,7 @@
           <div class="c-body">
             <p class="c-title" data-i18n="cal-s3-title" data-es="2024 hasta hoy: nuevos horizontes" data-en="2024 to Today: New Horizons">2024 hasta hoy: nuevos horizontes</p>
             <p class="c-desc" data-i18n="cal-s3-desc" data-es="Luego de mi parate, cuando volvimos a la normalidad retomé el entrenamiento. Me costó demasiado; tuve que empezar desde cero en muchos ejercicios, pero lo hice con otra mentalidad y un enfoque distinto. Ya no solo quería hacer trucos de freestyle en la barra: comencé a focalizarme en ejercicios de fuerza y estáticos." data-en="After my break, when things returned to normal I resumed training. It was really tough — I had to start from scratch in many exercises, but I did it with a different mindset and a new focus. I no longer just wanted to do freestyle tricks on the bar: I began focusing on strength and static exercises.">Luego de mi parate, cuando volvimos a la normalidad retomé el entrenamiento. Me costó demasiado; tuve que empezar desde cero en muchos ejercicios, pero lo hice con otra mentalidad y un enfoque distinto. Ya no solo quería hacer trucos de freestyle en la barra: comencé a focalizarme en ejercicios de fuerza y estáticos.</p>
-            <button class="c-btn" data-i18n="cal-btn-video" onclick="openModal(3)">▶ Ver video</button>
+            <button class="c-btn" data-i18n="cal-btn-video" data-es="▶ Ver video" data-en="▶ Watch video" onclick="openModal(3)">▶ Ver video</button>
           </div>
         </div>
         <!-- FIN SLIDE 4 -->
@@ -750,6 +750,32 @@ window.__idiomaPatch = function (lang) {
     if (typeof window._renderModalGlobal === 'function') window._renderModalGlobal();
   }
 };
+
+function aplicarIdioma(lang) {
+  lang = lang || localStorage.getItem('idioma') || 'es';
+  window.__idiomaPatch(lang);
+}
+window.aplicarIdioma = aplicarIdioma;
+
+function setIdioma(lang) {
+  localStorage.setItem('idioma', lang);
+  var btnEs = document.getElementById('sidebar-btn-es');
+  var btnEn = document.getElementById('sidebar-btn-en');
+  if (btnEs) {
+    btnEs.style.background = lang === 'es' ? 'rgba(255,255,255,0.15)' : 'transparent';
+    btnEs.style.color      = lang === 'es' ? 'white' : 'rgba(255,255,255,0.4)';
+    btnEs.style.border     = lang === 'es' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+  }
+  if (btnEn) {
+    btnEn.style.background = lang === 'en' ? 'rgba(255,255,255,0.15)' : 'transparent';
+    btnEn.style.color      = lang === 'en' ? 'white' : 'rgba(255,255,255,0.4)';
+    btnEn.style.border     = lang === 'en' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+  }
+  aplicarIdioma(lang);
+}
+document.addEventListener('DOMContentLoaded', function() {
+  setIdioma(localStorage.getItem('idioma') || 'es');
+});
 </script>
 
 <script src="idioma.js"></script>

@@ -221,16 +221,38 @@
 
 
   <script>
-    window.__idiomaPatch = function(lang) {
-      document.querySelectorAll('[data-es]').forEach(function(el) {
-        var val = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es');
-        if (val !== null) el.textContent = val;
-      });
-    };
-    document.addEventListener('DOMContentLoaded', function() {
-      var lang = localStorage.getItem('idioma') || 'es';
-      if (typeof aplicarIdioma === 'function') aplicarIdioma(lang);
+  function aplicarIdioma(lang) {
+    lang = lang || localStorage.getItem('idioma') || 'es';
+    document.querySelectorAll('[data-es]').forEach(function(el) {
+      var val = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es');
+      if (val === null) return;
+      if (el.children.length === 0) {
+        el.textContent = val;
+      } else {
+        el.innerHTML = val;
+      }
     });
+  }
+  function setIdioma(lang) {
+    localStorage.setItem('idioma', lang);
+    var btnEs = document.getElementById('sidebar-btn-es');
+    var btnEn = document.getElementById('sidebar-btn-en');
+    if (btnEs) {
+      btnEs.style.background = lang === 'es' ? 'rgba(255,255,255,0.15)' : 'transparent';
+      btnEs.style.color      = lang === 'es' ? 'white' : 'rgba(255,255,255,0.4)';
+      btnEs.style.border     = lang === 'es' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+    }
+    if (btnEn) {
+      btnEn.style.background = lang === 'en' ? 'rgba(255,255,255,0.15)' : 'transparent';
+      btnEn.style.color      = lang === 'en' ? 'white' : 'rgba(255,255,255,0.4)';
+      btnEn.style.border     = lang === 'en' ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)';
+    }
+    aplicarIdioma(lang);
+  }
+  window.__idiomaPatch = function(lang) { aplicarIdioma(lang); };
+  document.addEventListener('DOMContentLoaded', function() {
+    setIdioma(localStorage.getItem('idioma') || 'es');
+  });
   </script>
   <script src="script.js"></script>
   <script src="idioma.js"></script>
@@ -648,7 +670,7 @@
     margin-top: 4px;
     text-align: center;
     letter-spacing: 0.5px;
-  ">Estoy para ayudar</p>
+  " data-es="Estoy para ayudar" data-en="Here to help">Estoy para ayudar</p>
 
 </div>
 
